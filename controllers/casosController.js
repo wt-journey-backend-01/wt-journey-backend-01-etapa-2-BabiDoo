@@ -1,4 +1,5 @@
 import * as repository from '../repositories/casosRepository.js';
+import * as agentesRepo from '../repositories/agentesRepository.js';
 import { casosSchema } from '../utils/casosValidation.js';
 import { casosPatchSchema } from '../utils/dadosParciaisValidation.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -19,7 +20,7 @@ const getAllCases = (req, res, next) => {
     try {
         const cases  = repository.findAll();
         res.status(200).json(cases)
-    } catch (error) {
+    } catch (err) {
         next( new ApiError ('Não foi possível listar os casos'));
     }
 };
@@ -82,7 +83,7 @@ const patchCase = (req, res, next) => {
   try {
     const id = idSchema.parse(req.params.id);
     const partialData = casosPatchSchema.parse(req.body);
-    if (partial.agenteId && !agentesRepo.findById(partial.agenteId)) {
+    if (partialData.agenteId && !agentesRepo.findById(partialData.agenteId)) {
       return next(new ApiError('Agente informado não existe.', 404));
     }
     const updated = repository.patch(id, partialData);

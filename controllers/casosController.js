@@ -1,5 +1,5 @@
 import * as repository from '../repositories/casosRepository.js';
-import { casosSchema } from '../utils/agentesValidation.js';
+import { casosSchema } from '../utils/casosValidation.js';
 import { casosPatchSchema } from '../utils/dadosParciaisValidation.js';
 import { v4 as uuidv4 } from 'uuid';
 

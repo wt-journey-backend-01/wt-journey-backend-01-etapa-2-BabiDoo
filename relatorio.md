@@ -1,75 +1,116 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 9 créditos restantes para usar o sistema de feedback AI.
+Você tem 8 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para BabiDoo:
 
 Nota final: **25.5/100**
 
-# Feedback para BabiDoo 🚀✨
+# Feedback para a BabiDoo 🚀✨
 
-Oi Babi! Tudo bem? Primeiro, parabéns pelo esforço em começar a construir essa API para o Departamento de Polícia! 🎉 Sei que desafios assim não são fáceis, mas vamos juntos destrinchar o que rolou no seu código e como podemos melhorar para deixar tudo redondinho, ok? Bora lá! 👩‍💻👨‍💻
-
----
-
-## 🎯 O que você já mandou bem!
-
-- Seu `server.js` está muito bem estruturado! Você já configurou o Express, importou as rotas, usou o middleware para JSON e deixou o servidor rodando numa porta dinâmica com fallback para 3000. Isso é essencial e já mostra que você entende o básico do Express. 👏
-
-```js
-import express from 'express';
-import agentRoutes from './routes/agentRoutes.js';
-import caseRoutes from './routes/caseRoutes.js';
-
-const app = express();
-app.use(express.json());
-app.use('/agents', agentRoutes);
-app.use('/cases', caseRoutes);
-
-app.listen(PORT, () => console.log(`Server on port ${PORT}`));
-```
-
-- Você também já estruturou seu projeto com pastas para controllers, repositories, routes e utils, o que é ótimo para manter o código organizado e escalável.
-
-- Outro ponto positivo é que você já implementou corretamente o retorno de status 404 para buscas e operações com IDs inexistentes, mostrando que você já tem uma noção de tratamento de erros para recursos não encontrados.
-
-- Além disso, parabéns por usar `import 'dotenv/config'` para carregar variáveis de ambiente, isso é uma boa prática para projetos reais! 🌱
+Oi Babi! Tudo bem? Primeiro, quero dizer que adorei ver você se aventurando nesse desafio de API REST com Node.js e Express.js! 🎉 Construir uma API para um Departamento de Polícia é um tema super legal e cheio de possibilidades para aprender bastante. Vamos juntos destrinchar o que rolou no seu código e como você pode evoluir rapidinho, combinado? 💪😄
 
 ---
 
-## 🕵️‍♂️ Onde o código pede atenção (e por quê)
+## 🎯 O que você mandou bem (parabéns! 👏)
+
+- Seu `server.js` está bem estruturado e claro. Você já usou o `express.json()` para lidar com JSON, importou rotas e configurou o servidor para escutar na porta correta, usando variável de ambiente. Isso mostra que você já entende o básico do Express e organização inicial do projeto.
+  
+- Você configurou o `package.json` corretamente, com as dependências essenciais (`express`, `dotenv`, `uuid`, `zod` etc), e scripts para rodar o projeto. Isso é importante para manter o projeto organizado e pronto para rodar.
+
+- Você criou uma estrutura de pastas com `controllers`, `repositories`, `routes` e `utils`, o que é ótimo para um projeto modular e escalável.
+
+- Além disso, você implementou corretamente o tratamento para os casos em que o recurso não existe, retornando status 404, o que mostra atenção ao tratamento de erros.
+
+---
+
+## 🕵️‍♀️ Onde o código precisa de atenção (o que está travando seu projeto)
 
 ### 1. Falta dos arquivos de rotas, controllers e repositories para agentes e casos
 
-Aqui está o ponto mais crítico que impacta quase tudo no seu projeto. Percebi que os arquivos:
+Esse é o ponto mais crítico que encontrei no seu projeto. No seu `server.js`, você está importando e usando as rotas:
 
-- `routes/agentsRoutes.js`
-- `routes/casesRoutes.js`
-- `controllers/agentsController.js`
-- `controllers/casesController.js`
-- `repositories/agentsRepository.js`
-- `repositories/casesRepository.js`
+```js
+import agentRoutes from './routes/agentRoutes.js';
+import caseRoutes from './routes/caseRoutes.js';
 
-**não existem no seu repositório.**
+app.use('/agents', agentRoutes);
+app.use('/cases', caseRoutes);
+```
 
-Isso é fundamental porque:
+Porém, ao analisar seu repositório, esses arquivos **não existem**:
 
-- Sem as rotas, o Express não sabe como responder às requisições para `/agents` e `/cases`.
-- Sem os controllers, você não terá a lógica para manipular as requisições recebidas.
-- Sem os repositories, você não terá onde armazenar e manipular os dados na memória.
+- `routes/agentRoutes.js` e `routes/caseRoutes.js` não estão presentes.
+- `controllers/agentesController.js` e `controllers/casosController.js` também não estão.
+- `repositories/agentesRepository.js` e `repositories/casosRepository.js` também faltam.
 
-Por isso, todos os testes de criação, leitura, atualização e deleção de agentes e casos falharam — o código simplesmente não tem esses blocos para funcionar.
+Sem essas peças fundamentais, o Express não sabe o que fazer quando recebe requisições para `/agents` ou `/cases`. Isso explica porque as operações de CRUD não funcionam — o endpoint simplesmente não está implementado! 😮
 
 ---
 
-### Como começar a corrigir isso?
+### 2. Estrutura de diretórios e nomes dos arquivos
 
-Vamos criar, por exemplo, a rota para agentes:
+Ao comparar sua estrutura com a esperada, percebi alguns detalhes que precisam ser ajustados para seguir o padrão do desafio:
+
+- Os nomes dos arquivos devem estar em português e no plural, como `agentesRoutes.js`, `casosRoutes.js`, `agentesController.js`, `casosController.js`, `agentesRepository.js` e `casosRepository.js`. No seu projeto, você tem arquivos com nomes em inglês (`agentRoutes.js`, `caseRoutes.js`, etc) e também a ausência deles.
+
+- A estrutura esperada é:
+
+```
+routes/
+  agentesRoutes.js
+  casosRoutes.js
+controllers/
+  agentesController.js
+  casosController.js
+repositories/
+  agentesRepository.js
+  casosRepository.js
+```
+
+Seguir essa arquitetura é fundamental para que o projeto funcione e para que você consiga organizar o código de forma clara e escalável. Além disso, a consistência nos nomes evita confusão e facilita a manutenção.
+
+---
+
+### 3. IDs utilizados não são UUIDs
+
+Vi que você recebeu uma penalidade porque os IDs para agentes e casos não são UUIDs. Isso é importante porque UUIDs são identificadores únicos e garantem que cada agente ou caso tenha um ID exclusivo e difícil de colidir.
+
+Para gerar UUIDs no Node.js, você pode usar a biblioteca `uuid` que já está no seu `package.json`. Um exemplo simples para criar um novo ID:
 
 ```js
-// routes/agentsRoutes.js
+import { v4 as uuidv4 } from 'uuid';
+
+const novoId = uuidv4();
+```
+
+Ao criar um agente ou caso, você deve gerar o ID assim para garantir unicidade e passar na validação.
+
+---
+
+### 4. Falta de validações e tratamento de erros detalhado
+
+Como os arquivos de controllers e repositories estão ausentes, é natural que as validações de payload, o tratamento correto dos status HTTP (400 para payload inválido, 201 para criação, 204 para exclusão sem conteúdo, etc) e os retornos personalizados de erro também não estejam implementados.
+
+Esses detalhes são essenciais para que sua API seja robusta e confiável.
+
+---
+
+### 5. Não implementação dos endpoints para filtros e ordenações (bônus)
+
+Percebi que você ainda não implementou os filtros, ordenação e mensagens de erro customizadas, que são o diferencial para dar aquele upgrade na sua API. Mas isso só faz sentido depois que a base estiver sólida, ou seja, com os endpoints funcionando.
+
+---
+
+## 💡 Como seguir daqui? Vamos colocar a mão na massa!
+
+### Passo 1: Criar as rotas para agentes e casos
+
+No arquivo `routes/agentesRoutes.js`, você deve criar algo assim:
+
+```js
 import express from 'express';
-import { getAllAgents, getAgentById, createAgent, updateAgent, deleteAgent } from '../controllers/agentsController.js';
+import { getAllAgents, getAgentById, createAgent, updateAgent, partialUpdateAgent, deleteAgent } from '../controllers/agentesController.js';
 
 const router = express.Router();
 
@@ -77,160 +118,120 @@ router.get('/', getAllAgents);
 router.get('/:id', getAgentById);
 router.post('/', createAgent);
 router.put('/:id', updateAgent);
-router.patch('/:id', updateAgent);
+router.patch('/:id', partialUpdateAgent);
 router.delete('/:id', deleteAgent);
 
 export default router;
 ```
 
-E no controller, um exemplo básico:
+Faça o mesmo para `routes/casosRoutes.js`, importando as funções do `casosController.js`.
+
+---
+
+### Passo 2: Implementar os controllers
+
+No `controllers/agentesController.js`, você vai importar o repositório e criar funções para cada rota, por exemplo:
 
 ```js
-// controllers/agentsController.js
-import agentsRepository from '../repositories/agentsRepository.js';
+import * as agentesRepository from '../repositories/agentesRepository.js';
 
 export const getAllAgents = (req, res) => {
-  const agents = agentsRepository.findAll();
+  const agents = agentesRepository.getAll();
   res.status(200).json(agents);
 };
 
-// Implementar as outras funções seguindo essa linha...
-```
-
-E o repository para armazenar dados em memória:
-
-```js
-// repositories/agentsRepository.js
-let agents = [];
-
-export default {
-  findAll: () => agents,
-  findById: (id) => agents.find(agent => agent.id === id),
-  create: (agent) => {
-    agents.push(agent);
-    return agent;
-  },
-  // Métodos para update e delete também são necessários
-};
+// Implementar as outras funções (getAgentById, createAgent, etc) de forma semelhante
 ```
 
 ---
 
-### 2. Estrutura de diretórios e nomes dos arquivos
+### Passo 3: Criar os repositories para armazenar os dados em memória
 
-Percebi também que no seu projeto os nomes dos arquivos e pastas estão diferentes do que era esperado. Por exemplo, você tem `agentRoutes.js` e `caseRoutes.js` (no singular), mas o esperado era `agentesRoutes.js` e `casosRoutes.js` (no plural, em português).
-
-Além disso, no seu `server.js` você importa:
-
-```js
-import agentRoutes from './routes/agentRoutes.js';
-import caseRoutes from './routes/caseRoutes.js';
-```
-
-Mas na estrutura esperada, os arquivos deveriam ser:
-
-```
-routes/
-├── agentesRoutes.js
-└── casosRoutes.js
-```
-
-Essa diferença pode causar confusão e dificultar o entendimento do projeto, além de impactar na organização e manutenção do código.
-
----
-
-### 3. IDs devem ser UUIDs
-
-Vi que houve uma penalidade por usar IDs que não são UUIDs para agentes e casos. Isso é importante porque o UUID garante unicidade global e é um padrão muito usado em APIs.
-
-Você pode usar a biblioteca `uuid` (que você já tem nas dependências) para gerar esses IDs:
+No `repositories/agentesRepository.js`, você pode ter algo assim:
 
 ```js
 import { v4 as uuidv4 } from 'uuid';
 
-const newAgent = {
-  id: uuidv4(),
-  name: 'Fulano',
-  // outros campos
+let agentes = [];
+
+export const getAll = () => agentes;
+
+export const getById = (id) => agentes.find(agent => agent.id === id);
+
+export const create = (agentData) => {
+  const newAgent = { id: uuidv4(), ...agentData };
+  agentes.push(newAgent);
+  return newAgent;
 };
+
+// Implemente update, partialUpdate, delete também
 ```
 
 ---
 
-### 4. Validação e tratamento de erros
+### Passo 4: Validar os dados e tratar erros
 
-Outro ponto que falta no seu código é a validação dos dados recebidos no corpo das requisições e o tratamento adequado dos erros, retornando status 400 quando o payload estiver incorreto.
-
-Você pode usar a biblioteca `zod` (que também está nas suas dependências) para definir schemas de validação, por exemplo:
+Use o `zod` para validar os dados recebidos, por exemplo:
 
 ```js
 import { z } from 'zod';
 
-const agentSchema = z.object({
-  name: z.string().min(1),
-  // outros campos e validações
+const agenteSchema = z.object({
+  nome: z.string().min(1),
+  matricula: z.string().min(1),
+  // outros campos
 });
 
-export const validateAgent = (data) => {
+export const validateAgente = (data) => {
   try {
-    agentSchema.parse(data);
-    return true;
+    agenteSchema.parse(data);
+    return null;
   } catch (error) {
-    return false;
+    return error.errors;
   }
 };
 ```
 
-Depois, no controller, você verifica se o payload é válido antes de continuar.
+No controller, você pode usar essa validação para retornar 400 se os dados estiverem errados.
 
 ---
 
-### 5. Filtros, ordenação e mensagens de erro customizadas (Bônus)
+### Recursos para você aprender e se aprofundar
 
-Percebi que você ainda não implementou os filtros e ordenações para os endpoints, nem as mensagens de erro customizadas. Isso é um ótimo diferencial para a sua API ficar mais completa e amigável!
-
----
-
-## 📚 Recomendações de estudos para você arrasar!
-
-- Para organizar suas rotas, controllers e repositories, recomendo muito este vídeo que explica a arquitetura MVC aplicada ao Node.js:  
-  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
-
-- Para entender melhor como criar rotas e usar o `express.Router()`, dê uma olhada na documentação oficial do Express:  
+- Para entender como montar rotas e usar `express.Router()`:  
   https://expressjs.com/pt-br/guide/routing.html
 
-- Para aprender sobre validação de dados e tratamento de erros, este vídeo é super didático:  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
+- Para organizar seu projeto com arquitetura MVC (rotas, controllers, repositories):  
+  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
 
-- Para garantir que seus IDs sejam UUIDs e como gerar eles com a biblioteca `uuid`, veja este tutorial:  
-  https://www.npmjs.com/package/uuid
-
-- Por fim, para entender melhor os status HTTP e como usá-los corretamente na sua API, este vídeo vai te ajudar muito:  
+- Para entender melhor a criação de APIs REST com Express e manipulação de status HTTP:  
   https://youtu.be/RSZHvQomeKE
 
----
+- Para validação de dados em APIs Node.js com `zod`:  
+  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
 
-## 📝 Resumo rápido para focar nos próximos passos
-
-- **Crie os arquivos e implemente as rotas, controllers e repositories para agentes e casos.** Sem eles, sua API não responde às requisições.  
-- **Padronize os nomes dos arquivos e pastas conforme o esperado no projeto.** Isso facilita a organização e manutenção.  
-- **Use UUID para os IDs de agentes e casos, gerando-os com a biblioteca `uuid`.**  
-- **Implemente validação de dados com `zod` e tratamento de erros com retornos 400 para payloads inválidos.**  
-- **Depois que a base estiver funcionando, avance para filtros, ordenação e mensagens de erro customizadas para deixar sua API mais robusta.**
+- Para aprender a usar UUIDs no Node.js:  
+  https://www.npmjs.com/package/uuid
 
 ---
 
-## Para finalizar... 🌟
+## 📝 Resumo rápido para você focar
 
-Babi, você já está no caminho certo! O fato de ter estruturado o `server.js` e organizado seu projeto em pastas mostra que você entende os conceitos básicos. Agora é hora de preencher essa estrutura com o código que faz a API funcionar de verdade. Pense no projeto como um quebra-cabeça: o `server.js` é a moldura, e as rotas, controllers e repositories são as peças que precisam estar no lugar para formar a imagem completa.
-
-Não desanime com as dificuldades! Programar é assim mesmo, um aprendizado constante. Continue firme, use os recursos que indiquei, e logo você terá uma API incrível pronta para usar. Se precisar, volte aqui que eu estarei para ajudar! 💪✨
-
-Boa codada e até a próxima! 🚀👩‍💻👨‍💻
+- **Crie os arquivos de rotas, controllers e repositories para agentes e casos** seguindo a estrutura e nomes esperados.
+- **Implemente os endpoints HTTP (GET, POST, PUT, PATCH, DELETE)** para `/agentes` e `/casos`.
+- **Use UUIDs para os IDs** de agentes e casos para garantir unicidade.
+- **Implemente validação dos dados recebidos** com `zod` e retorne status 400 para payloads inválidos.
+- **Trate erros e retorne status HTTP corretos** para cada situação (201, 204, 404, 400).
+- **Organize seu projeto seguindo a arquitetura modular MVC** para facilitar manutenção e escalabilidade.
+- Depois que a base estiver funcionando, você pode avançar para os filtros, ordenações e mensagens de erro customizadas para melhorar sua API.
 
 ---
 
-Abraços do seu Code Buddy! 🤖💙
+Babi, você está no caminho certo, só precisa dar esses passos fundamentais para destravar todo o potencial do seu projeto! 🚀 Não desanime com as dificuldades, elas são parte do aprendizado. Estou aqui para te ajudar sempre que precisar! 💜
+
+Continue firme, que você vai arrasar! 👊✨
+
+Um abraço do seu Code Buddy! 🤖💙
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 

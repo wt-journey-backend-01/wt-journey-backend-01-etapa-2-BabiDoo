@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Etapa 2 DepartPM - WebTech Journey Backend",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --watch server.js"

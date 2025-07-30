@@ -1,13 +1,13 @@
 import express from 'express';
 import * as controller from '../controllers/caseController.js';
 
-const router = express.Router();
+const caseRouter = express.Router();
 
-router.get('/', controller.getAllCases);
-router.get('/:id', controller.getCaseById);
-router.post('/', controller.createCase);
-router.put('/:id', controller.updateCase);
-router.patch('/:id', controller.patchCase);
-router.delete('/:id', controller.deleteCase);
+caseRouter.get('/', controller.getAllCases);
+caseRouter.get('/:id', controller.getCaseById);
+caseRouter.post('/', controller.createCase);
+caseRouter.put('/:id', controller.updateCase);
+caseRouter.patch('/:id', controller.patchCase);
+caseRouter.delete('/:id', controller.deleteCase);
 
-export { router as caseRouter };
+export default caseRouter;

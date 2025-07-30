@@ -1,13 +1,13 @@
 import express from 'express';
 import * as controller from '../controllers/agentController.js';
 
-const router = express.Router();
+const agentRouter = express.Router();
 
-router.get('/', controller.getAllAgents);
-router.get('/:id', controller.getAgentById);
-router.post('/', controller.createAgent);
-router.put('/:id', controller.updateAgent);
-router.patch('/:id', controller.patchAgent);
-router.delete('/:id', controller.deleteAgent);
+agentRouter.get('/', controller.getAllAgents);
+agentRouter.get('/:id', controller.getAgentById);
+agentRouter.post('/', controller.createAgent);
+agentRouter.put('/:id', controller.updateAgent);
+agentRouter.patch('/:id', controller.patchAgent);
+agentRouter.delete('/:id', controller.deleteAgent);
 
-export { router as agentRouter };
+export default agentRouter;

@@ -21,7 +21,7 @@ const getAllCases = (req, res, next) => {
         const cases  = repository.findAll();
         res.status(200).json(cases)
     } catch (err) {
-        next( new ApiError ('Não foi possível listar os casos'));
+        return next( new ApiError ('Não foi possível listar os casos'));
     }
 };
 
@@ -35,7 +35,7 @@ const getCaseById = (req, res, next) => {
     if (err instanceof ZodError) {
       return next(new ApiError(err.message, 400));
     }
-    next(new ApiError('Erro ao buscar o caso.', 500));
+    return next(new ApiError('Erro ao buscar o caso.', 500));
   }
 };
 
@@ -57,7 +57,7 @@ const createCase = (req, res, next) => {
         if (err instanceof ZodError) {
             return next(new ApiError(err.message, 400));
         }
-    next(new ApiError('Não foi possível criar este caso.', 500));
+    return next(new ApiError('Não foi possível criar este caso.', 500));
   }
 };
 
@@ -75,7 +75,7 @@ const updateCase = (req, res, next) => {
         if (err instanceof ZodError) {
         return next(new ApiError(err.message, 400));
     }
-    next(new ApiError('Erro ao atualizar o caso.', 500));
+    return next(new ApiError('Erro ao atualizar o caso.', 500));
   }
 };
 
@@ -93,7 +93,7 @@ const patchCase = (req, res, next) => {
     if (err instanceof ZodError) {
       return next(new ApiError(err.message, 400));
     }
-    next(new ApiError('Erro ao atualizar parcialmente o caso.', 500));
+    return next(new ApiError('Erro ao atualizar parcialmente o caso.', 500));
   }
 };
 
@@ -108,7 +108,7 @@ const deleteCase = (req, res, next) => {
     if (err instanceof ZodError) {
       return next(new ApiError(err.message, 400));
     }
-    next(new ApiError('Erro ao deletar o caso.', 500));
+    return next(new ApiError('Erro ao deletar o caso.', 500));
   }
 };
 

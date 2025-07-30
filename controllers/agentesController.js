@@ -17,7 +17,7 @@ const getAllAgents = (req, res, next) => {
         const agents  = repository.findAll();
         res.status(200).json(agents)
     } catch (error) {
-        next( new ApiError ('Não foi possível listar os agentes.', 500));
+        return next( new ApiError ('Não foi possível listar os agentes.', 500));
     }
 };
 
@@ -31,7 +31,7 @@ const getAgentById = (req, res, next) => {
     if (error instanceof z.ZodError) {
       return next(new ApiError('ID inválido, deve ser UUID.', 400));}
     }
-    next(new ApiError(error.message, 500));
+    return next(new ApiError(error.message, 500));
 };
 
 const createAgent = (req, res, next) => {
@@ -47,7 +47,7 @@ const createAgent = (req, res, next) => {
         if (error instanceof z.ZodError) {
         return next(new ApiError('Não foi possível criar um agente.', 400));} 
     }
-    next(new ApiError(error.message, 500));
+    return next(new ApiError(error.message, 500));
 };
 
 const updateAgent = (req, res, next) => {
@@ -61,7 +61,7 @@ const updateAgent = (req, res, next) => {
     if (error instanceof ZodError) {
       return next(new ApiError(error.message, 400));
     }
-    next(new ApiError('Erro ao atualizar o agente.', 500));
+    return next(new ApiError('Erro ao atualizar o agente.', 500));
   }
 };
 
@@ -76,7 +76,7 @@ const patchAgent = (req, res, next) => {
     if (error instanceof ZodError) {
       return next(new ApiError(error.message, 400));
     }
-    next(new ApiError('Erro ao atualizar parcialmente o agente.', 500));
+    return next(new ApiError('Erro ao atualizar parcialmente o agente.', 500));
   }
 };
 
@@ -91,7 +91,7 @@ const deleteAgent = (req, res, next) => {
     if (error instanceof ZodError) {
       return next(new ApiError(error.message, 400));
     }
-    next(new ApiError('Erro ao deletar o agente.', 500));
+    return next(new ApiError('Erro ao deletar o agente.', 500));
   }
 };
 

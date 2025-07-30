@@ -7,7 +7,8 @@ const agentSchema = z.object({
     }).refine(val => !isNaN(Date.parse(val)), {
       message: 'A data deve estar no formato YYYY-MM-DD.',
     }).transform(val => new Date(val)),
-    position: z.string({ require_error: 'O cargo é obrigatório.', invalid_type_error: 'Use apenas letras.'}).min(1, 'O cargo não pode ser vazio')
+    position: z.string({ require_error: 'O cargo é obrigatório.', invalid_type_error: 'Use apenas letras.'}).min(1, 'O cargo não pode ser vazio'),
+    agentId: z.uuid({ require_error: 'Uma autoridade responsável é obrigatório.'})
 })
 
 export { agentSchema };

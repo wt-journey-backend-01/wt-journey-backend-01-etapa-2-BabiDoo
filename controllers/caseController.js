@@ -1,6 +1,6 @@
-import * as repository from '../repositories/caseRepository';
-import { caseSchema } from '../utils/caseValidation';
-import { patchSchema } from '../utils/partialDataValidation.js';
+import * as repository from '../repositories/caseRepository.js';
+import { caseSchema } from '../utils/caseValidation.js';
+import { casePatchSchema } from '../utils/partialDataValidation.js';
 
 class ApiError extends Error {
     constructor(message, statusCode = 500) {
@@ -55,7 +55,7 @@ const updateCase = (req, res, next) => {
 const patchCase = (req, res, next) => {
   const { id } = req.params;
   try {
-    const partialData = patchSchema.parse(req.body);
+    const partialData = casePatchSchema.parse(req.body);
     const updated = repository.patch(id, partialData);
     if (!updated) return next(new ApiError('Caso não encontrado.', 404));
     res.status(200).json(updated);

@@ -1,6 +1,6 @@
-import * as repository from '../repositories/agentRepository';
-import { agentSchema } from '../utils/agentValidation';
-import { patchSchema } from '../utils/partialDataValidation.js';
+import * as repository from '../repositories/agentRepository.js';
+import { agentSchema } from '../utils/agentValidation.js';
+import { agentPatchSchema } from '../utils/partialDataValidation.js';
 
 class ApiError extends Error {
     constructor(message, statusCode = 500) {
@@ -55,7 +55,7 @@ const updateAgent = (req, res, next) => {
 const patchAgent = (req, res, next) => {
   const { id } = req.params;
   try {
-    const partialData = patchSchema.parse(req.body);
+    const partialData = agentPatchSchema.parse(req.body);
     const updated = repository.patch(id, partialData);
     if (!updated) return next(new ApiError('Agente não encontrado.', 404));
     res.status(200).json(updated);

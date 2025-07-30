@@ -1,15 +1,12 @@
-import { v4 as uuidv4 } from 'uuid';
-
 const cases = [];
 
 const findAll = () => cases;
 
 const findById = (id) => cases.find((c) => c.id === id);
 
-const create = (data) => {
-    const newCase = { id: uuidv4(), ...data};
+const create = (newCase) => {
     cases.push(newCase);
-    return newCase;
+    return cases;
 };
 
 const update = (id, data) => {

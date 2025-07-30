@@ -1,6 +1,7 @@
 import * as repository from '../repositories/caseRepository.js';
 import { caseSchema } from '../utils/caseValidation.js';
 import { casePatchSchema } from '../utils/partialDataValidation.js';
+import { v4 as uuidv4 } from 'uuid';
 
 class ApiError extends Error {
     constructor(message, statusCode = 500) {
@@ -33,8 +34,12 @@ const getCaseById = (req, res, next) => {
 const createCase = (req, res, next) => {
     try {
         const data = caseSchema.parse(req.body);
-        const createdCase = repository.create(data);
-        res.status(201).json(createdCase);
+        const newCase = {
+            id: uuidv4(),
+            ...data
+        };
+        const caseItem = repository.create(newCase);
+        res.status(201).json(caseItem);
     } catch (error) {
         next(new ApiError('Não foi possível criar este caso', 400));
     }

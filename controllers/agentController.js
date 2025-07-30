@@ -1,6 +1,7 @@
 import * as repository from '../repositories/agentRepository.js';
 import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
+import { v4 as uuidv4 } from 'uuid';
 
 class ApiError extends Error {
     constructor(message, statusCode = 500) {
@@ -33,7 +34,11 @@ const getAgentById = (req, res, next) => {
 const createAgent = (req, res, next) => {
     try {
         const data = agentSchema.parse(req.body);
-        const agent = repository.create(data);
+        const newAgent = {
+            id: uuidv4(),
+            ...data
+        };
+        const agent = repository.create(newAgent);
         res.status(201).json(agent);
     } catch (error) {
         next(new ApiError('Não foi possível criar um agente', 400));

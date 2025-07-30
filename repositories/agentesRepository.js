@@ -23,7 +23,11 @@ const patch = (id, partialData) => {
 
 const remove = (id) => {
     const index = agentes.findIndex((a) => a.id === id);
-    if(index > -1) agentes.splice(index, 1);
+    if(index > -1) {
+        agentes.splice(index, 1);
+        return true;
+    }
+    return false;
 }
 
 export { findAll, findById, create, update, patch, remove };

@@ -6,7 +6,7 @@ const findById = (id) => casos.find((c) => c.id === id);
 
 const create = (newCase) => {
     casos.push(newCase);
-    return casos
+    return newCase;
 };
 
 const update = (id, data) => {
@@ -23,7 +23,11 @@ const patch = (id, partialData) => {
 
 const remove = (id) => {
     const index = casos.findIndex((c) => c.id === id);
-    if(index > -1) casos.splice(index, 1);
+    if(index > -1) {
+        casos.splice(index, 1);
+        return true;
+    }
+    return false;
 }
 
 export { findAll, findById, create, update, patch, remove };

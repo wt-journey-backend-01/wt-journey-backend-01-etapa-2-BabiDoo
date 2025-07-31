@@ -1,189 +1,237 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 4 créditos restantes para usar o sistema de feedback AI.
+Você tem 3 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para BabiDoo:
 
-Nota final: **30.8/100**
+Nota final: **28.1/100**
 
 # Feedback para você, BabiDoo! 🚀✨
 
-Oi, Babi! Tudo bem? Primeiro, quero dizer que você fez um baita esforço para montar essa API do Departamento de Polícia com Node.js e Express. 👏👏👏 É muito legal ver que você estruturou seu projeto com rotas, controllers, repositories e até implementou validações usando Zod. Isso mostra que você está no caminho certo para construir APIs robustas e organizadas! 🎉
+Olá, Babi! Primeiro, quero dizer que parabéns pela dedicação em montar essa API para o Departamento de Polícia! 👏 Você estruturou seu projeto com uma organização muito boa, usando rotas, controladores e repositórios, o que já é um grande passo para criar um código escalável e fácil de manter. Também vi que você usou o Zod para validação e tratou erros com uma classe `ApiError` personalizada — isso mostra que está pensando em qualidade e robustez! 🎯
+
+Além disso, mandou bem no bônus de implementar a filtragem simples por keywords nos títulos e descrições dos casos, isso é um diferencial que mostra seu esforço para ir além do básico! 🎉
 
 ---
 
-## O que você mandou muito bem! 🎯
-
-- Sua organização de arquivos está alinhada com o que o desafio pede: você tem pastas separadas para `routes/`, `controllers/`, `repositories/` e `utils/`. Isso é essencial para manter o projeto escalável e fácil de entender.  
-- Você criou middlewares de tratamento de erros personalizados com a classe `ApiError` e o middleware `errorHandler`. Isso é ótimo para manter uma resposta consistente para o cliente.
-- As rotas para `/agentes` e `/casos` estão bem definidas, com todos os métodos HTTP (GET, POST, PUT, PATCH, DELETE) configurados.
-- O uso do Zod para validação dos dados de entrada é uma ótima prática, e você já capturou erros de validação para retornar status 400.
-- Você implementou o filtro simples por keywords no endpoint de casos, o que mostra que você já está pensando em funcionalidades extras. 👏
-- Os tratamentos de erro para casos de ID inválido (UUID) e recursos não encontrados (404) estão presentes, o que é fundamental para uma API amigável e robusta.
+## Vamos analisar juntos os pontos que podem ser melhorados para deixar sua API tinindo! 🔍✨
 
 ---
 
-## Agora, vamos juntos entender onde podemos melhorar para destravar mais funcionalidades? 🕵️‍♀️🔍
+### 1. IDs precisam ser UUIDs válidos — o coração da validação! 🆔💥
 
-### 1. Penalidades: IDs de agentes e casos não são UUIDs válidos
+Vi que você recebeu uma penalidade por usar IDs que **não são UUIDs válidos** tanto para agentes quanto para casos. Isso é fundamental, pois o sistema depende da unicidade e formato correto dos IDs para encontrar os recursos.
 
-Um ponto crítico que notei é que, embora você esteja usando o `uuidv4()` para gerar IDs na criação de agentes e casos, os testes indicam que os IDs utilizados não são UUIDs válidos.
-
-Vamos analisar o trecho do seu controller de agentes:
+No seu código, você usa o `uuidv4()` para criar novos IDs, o que está correto:
 
 ```js
 import { v4 as uuidv4 } from 'uuid';
 
-const createAgent = (req, res, next) => {
-    try {
-        const data = agentesSchema.parse(req.body);
-        const newAgent = {
-            id: uuidv4(),
-            ...data
-        };
-        const agent = repository.create(newAgent);
-        res.status(201).json(agent);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return next(new ApiError('Não foi possível criar um agente.', 400));
-        }
-        next(new ApiError(error.message, 500));
-    }
+// Exemplo de criação:
+const newAgent = {
+    id: uuidv4(),
+    ...data
 };
 ```
 
-Aqui você está gerando o ID corretamente com `uuidv4()`. Porém, o problema pode estar na forma como os IDs são validados ou armazenados.
+Porém, o problema está na validação do ID que você faz nas rotas, usando o `idSchema` (que imagino ser um Zod schema), mas parece que ele não está configurado para validar UUIDs corretamente.
 
-**Possível causa raiz:**  
-- Verifique se em algum momento você está sobrescrevendo os IDs com valores que não são UUIDs, ou se os dados de teste que você usou para criar agentes e casos estão vindo com IDs inválidos.
-- Outra possibilidade é que, ao atualizar ou patchar, você esteja permitindo que o ID seja alterado para um valor inválido, o que não deve acontecer.
-
-**Dica:** Garanta que o campo `id` nunca seja alterado pelo cliente, apenas gerado pelo servidor. Você pode adicionar essa regra nas validações ou no controller.
-
----
-
-### 2. Falhas em vários testes básicos para os endpoints de `/agentes` e `/casos`
-
-Você implementou todos os endpoints para `/agentes` e `/casos`, o que é ótimo! Porém, muitos testes básicos de criação, leitura, atualização e exclusão falharam.
-
-Ao analisar seu código, percebo que a lógica para manipular os arrays em memória está correta nos repositories, e os controllers parecem chamar as funções certas. Então, o que pode estar acontecendo?
-
-**Hipótese importante:**  
-- Será que os dados de entrada estão sendo validados corretamente e enviados no formato esperado?  
-- Ou será que o problema está na forma como o servidor está lidando com as respostas e status codes?
-
-Vamos olhar um exemplo no controller de agentes, no método `createAgent`:
+Além disso, em alguns controladores você tem erros de digitação que podem estar afetando o fluxo de erros, por exemplo no `agentesController.js`:
 
 ```js
-const createAgent = (req, res, next) => {
-    try {
-        const data = agentesSchema.parse(req.body);
-        const newAgent = {
-            id: uuidv4(),
-            ...data
-        };
-        const agent = repository.create(newAgent);
-        res.status(201).json(agent);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return next(new ApiError('Não foi possível criar um agente.', 400));
-        }
-        next(new ApiError(error.message, 500));
+const getAgentById = (req, res, next) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const agent = repository.findById(id);
+    if (!agent) return next(new ApiError('Agente não encontrado.', 404));
+    res.status(200).json(agent);
+  } catch (error) {
+    if (err instanceof ZodError) {  // <-- aqui você usou 'err' mas o catch capturou 'error'
+      return next(new ApiError(err.message, 400));
     }
+    next(new ApiError('Erro ao buscar agente: ' + err.message, 500));
+}
 };
 ```
 
-Aqui, você está retornando o agente criado com status 201, o que está correto. Mas repare que no seu catch, quando o erro é instância de `ZodError`, você chama `next` com uma nova `ApiError` e retorna. Porém, fora desse if, você também chama `next` sem um `return`. Isso pode fazer com que o `next` seja chamado duas vezes, causando problemas no fluxo.
+Note que no `catch` você usa `error` mas dentro do bloco `if` você usa `err`, o que gera um ReferenceError e pode estar atrapalhando o tratamento correto. O mesmo acontece em outros métodos, como `updateAgent`.
 
-**Sugestão para melhorar o fluxo de erros:**
+**O que fazer?**
+
+- Ajuste seu schema `idSchema` para validar UUIDs. Um exemplo com Zod:
+
+```js
+import { z } from 'zod';
+
+export const idSchema = z.string().uuid();
+```
+
+- Corrija os nomes das variáveis no `catch` para usar sempre o mesmo nome, por exemplo `error`:
 
 ```js
 catch (error) {
-    if (error instanceof z.ZodError) {
-        return next(new ApiError('Não foi possível criar um agente.', 400));
-    }
-    return next(new ApiError(error.message, 500));
+  if (error instanceof ZodError) {
+    return next(new ApiError(error.message, 400));
+  }
+  next(new ApiError('Erro ao buscar agente: ' + error.message, 500));
 }
 ```
 
-Note que o `return` antes do `next` evita que o código continue executando e chame o `next` novamente.
+Esse ajuste é crucial para que a validação do ID funcione e para que os erros sejam tratados corretamente, evitando falhas silenciosas que comprometem toda a API.
 
-Esse padrão deve ser aplicado em todos os seus controllers para evitar chamadas duplicadas de middleware, que podem gerar respostas inesperadas.
+**Recomendo fortemente este vídeo para entender melhor validação com Zod e tratamento de erros:**  
+https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
+
+E para entender UUIDs e validação de IDs:  
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400
 
 ---
 
-### 3. Validação e tratamento de erros nos controllers de casos
+### 2. Erros de tratamento e fluxo de erros nas controllers 🛑➡️✨
 
-No arquivo `casosController.js`, você faz uma validação para garantir que o `agenteId` informado exista:
+Além da questão dos nomes de variáveis no `catch`, percebi que em alguns métodos o fluxo de tratamento de erros não está completo, o que pode levar seu middleware de erro a não ser acionado corretamente.
+
+Por exemplo, no `createAgent`:
+
+```js
+const createAgent = (req, res, next) => {
+    try {
+        const data = agentesSchema.parse(req.body);
+        const newAgent = {
+            id: uuidv4(),
+            ...data
+        };
+        const agent = repository.create(newAgent);
+        res.status(201).json(agent);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return next(new ApiError('Não foi possível criar um agente.', 400));
+        }
+    }
+    return next(new ApiError(error.message, 500));  // <-- este return está fora do catch, pode causar erro
+};
+```
+
+Aqui você tem um `return next(...)` fora do bloco `catch`, e o `error` pode não estar definido nesse escopo, causando crash na aplicação. O correto é manter todo o tratamento dentro do catch, assim:
+
+```js
+const createAgent = (req, res, next) => {
+  try {
+    const data = agentesSchema.parse(req.body);
+    const newAgent = {
+      id: uuidv4(),
+      ...data,
+    };
+    const agent = repository.create(newAgent);
+    res.status(201).json(agent);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return next(new ApiError('Não foi possível criar um agente.', 400));
+    }
+    return next(new ApiError(error.message, 500));
+  }
+};
+```
+
+Esse ajuste garante que erros inesperados também sejam encaminhados para o seu middleware de tratamento, evitando que a API trave.
+
+---
+
+### 3. Endpoints de `/casos` estão implementados, mas atenção à validação de `agenteId` 👮‍♂️➡️🕵️‍♀️
+
+Você fez um ótimo trabalho validando se o `agenteId` informado nos casos realmente existe, antes de criar ou atualizar um caso:
 
 ```js
 if (!agentesRepo.findById(data.agenteId)) {
-    return next(new ApiError('Agente informado não existe.', 404));
+  return next(new ApiError('Agente informado não existe.', 404));
 }
 ```
 
-Isso é ótimo! Porém, para garantir que essa validação funcione corretamente, você precisa ter certeza que o `agentesRepo.findById` está funcionando e que os agentes estão sendo criados corretamente.
+Isso é fundamental para manter a integridade dos dados! Porém, se o ID do agente não for um UUID válido (como apontado no item 1), essa validação pode falhar ou aceitar IDs inválidos.
 
-Se os agentes não estão sendo criados ou armazenados corretamente, a validação do `agenteId` sempre falhará, impedindo a criação dos casos.
+Além disso, no patch dos casos, essa validação condicional está bem feita:
 
----
+```js
+if (partialData.agenteId && !agentesRepo.findById(partialData.agenteId)) {
+  return next(new ApiError('Agente informado não existe.', 404));
+}
+```
 
-### 4. Filtros e funcionalidades bônus incompletas
-
-Você já implementou o filtro simples por keywords nos casos, o que é ótimo! 🎉
-
-Porém, outros filtros bônus, como por status, por agente, e ordenação de agentes por data de incorporação, ainda não foram implementados.
-
-Se quiser avançar, recomendo criar middlewares ou funções específicas para esses filtros, usando `req.query` para capturar os parâmetros e filtrar os arrays em memória.
+Ou seja, seu código está no caminho certo para garantir consistência — só precisa garantir que o ID seja validado corretamente.
 
 ---
 
-### 5. Organização da estrutura e arquivos
+### 4. Organização da estrutura do projeto — está quase perfeita! 🗂️✅
 
-Sua estrutura está bem próxima do esperado, parabéns! 👏
+A estrutura do seu projeto está muito bem organizada, com pastas separadas para rotas, controllers, repositories e utils, conforme esperado:
 
-Só vale reforçar que o arquivo `.env` é opcional, mas é uma boa prática para armazenar variáveis como `PORT`. Você já está usando o `dotenv/config` no `server.js`, o que é ótimo.
+```
+.
+├── controllers
+│   ├── agentesController.js
+│   └── casosController.js
+├── repositories
+│   ├── agentesRepository.js
+│   └── casosRepository.js
+├── routes
+│   ├── agentesRoutes.js
+│   └── casosRoutes.js
+├── utils
+│   ├── agentesValidation.js
+│   ├── casosValidation.js
+│   ├── dadosParciaisValidation.js
+│   ├── errorHandler.js
+│   └── idValidation.js
+├── server.js
+```
+
+Só fique atento para garantir que seu arquivo `.env` esteja presente (mesmo que opcional) para centralizar configurações, e que o middleware de erro esteja bem configurado (o que parece estar correto, já que você importa e usa `errorHandler` no `server.js`).
+
+Se quiser entender melhor essa arquitetura MVC aplicada ao Node.js, recomendo este vídeo que explica tudo de forma clara:  
+https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
 
 ---
 
-## Recomendações de aprendizado para você! 📚✨
+### 5. Pequenos detalhes que fazem diferença no tratamento dos erros e na consistência do código ✨
 
-- Para entender melhor a arquitetura MVC e organização de rotas, controllers e repositories, recomendo fortemente este vídeo:  
-  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
+- Nos seus controllers, às vezes você usa `err` e outras vezes `error` no `catch`. Padronize para evitar bugs difíceis de detectar.  
+- Nos métodos `update` e `patch` dos controllers, o tratamento de erro do Zod deve ser consistente e usar o mesmo nome da variável capturada.  
+- Nos repositórios, você fez um ótimo uso dos métodos de array (`find`, `findIndex`, `splice`), o que é perfeito para manipular dados em memória. Se quiser se aprofundar, recomendo:  
+https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
 
-- Para aprofundar seu conhecimento em rotas e middlewares no Express, este guia oficial é excelente:  
-  https://expressjs.com/pt-br/guide/routing.html
+---
 
-- Sobre tratamento de erros e status codes HTTP (400, 404, 500), este artigo da MDN é fundamental:  
+## Resumo dos principais pontos para focar agora:
+
+- ✅ **Corrigir o schema de validação de ID para aceitar apenas UUIDs válidos.**  
+- ✅ **Padronizar o nome da variável no bloco `catch` para evitar erros de referência (usar sempre `error` ou `err`, mas consistentemente).**  
+- ✅ **Ajustar o fluxo de tratamento de erros para que todos os erros sejam encaminhados corretamente ao middleware de erro (evitar código fora do bloco `catch`).**  
+- ✅ **Garantir que a validação de `agenteId` em casos só aceite IDs UUID válidos.**  
+- ✅ **Manter a ótima organização do projeto e aproveitar para estudar mais sobre arquitetura MVC e validação com Zod.**
+
+---
+
+Babi, você já está no caminho certo, com uma base muito boa! 💪✨ Com esses ajustes, tenho certeza que sua API vai funcionar perfeitamente, com todas as validações e tratamentos de erros que uma aplicação profissional precisa.
+
+Continue firme, aprendendo e melhorando — você tem tudo para se tornar uma referência em backend com Node.js! 🚀😊
+
+---
+
+### Recursos recomendados para você revisar e aprofundar:
+
+- Validação e tratamento de erros com Zod: https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
+- Documentação oficial do Express para rotas: https://expressjs.com/pt-br/guide/routing.html  
+- Arquitetura MVC para Node.js: https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH  
+- Manipulação de arrays no JavaScript: https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
+- Status HTTP 400 e 404 (validação e recursos não encontrados):  
   https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
-  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404
-
-- Para entender melhor o fluxo de requisição e resposta e evitar problemas como chamar `next()` duas vezes, veja este vídeo:  
-  https://youtu.be/Bn8gcSQH-bc?si=Df4htGoVrV0NR7ri
-
-- Se quiser reforçar o uso de arrays e manipulação dos dados em memória, este vídeo ajuda muito:  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
+  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404  
 
 ---
 
-## Resumo rápido para você focar:
+Se precisar de ajuda para aplicar essas correções, me chama! Vou adorar acompanhar sua evolução! 🚀💙
 
-- ✅ Continue usando Zod para validação, mas garanta que o fluxo de erros não chame `next()` múltiplas vezes (use `return` antes do `next()`).
-- ✅ Verifique se os IDs gerados são realmente UUIDs válidos e que não estão sendo sobrescritos ou alterados indevidamente.
-- ✅ Confirme que os agentes estão sendo criados corretamente para que os casos consigam validar o `agenteId`.
-- ✅ Implemente os filtros bônus restantes para melhorar a funcionalidade da API.
-- ✅ Mantenha a estrutura do projeto organizada e consistente, como você já fez.
-- ✅ Evite que o cliente envie ou altere o campo `id` nos payloads de criação ou atualização.
-
----
-
-Babi, você está no caminho certo e já tem uma base muito boa! 💪 Não desanime com as dificuldades, elas são parte do aprendizado. Cada ajuste que você fizer vai te deixar mais forte no desenvolvimento backend. Continue praticando, revisando seu código com calma e testando os endpoints passo a passo.
-
-Se precisar, volte aos recursos que indiquei e experimente criar pequenos testes manuais com o Postman ou Insomnia para entender melhor o fluxo.
-
-Você tem tudo para se tornar uma desenvolvedora backend incrível! 🚀✨
-
-Um abraço do seu Code Buddy! 🤖💙
+Um abraço de Code Buddy! 🤖💡
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 

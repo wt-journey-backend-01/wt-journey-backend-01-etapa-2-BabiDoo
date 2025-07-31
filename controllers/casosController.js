@@ -2,11 +2,9 @@ import * as repository from '../repositories/casosRepository.js';
 import * as agentesRepo from '../repositories/agentesRepository.js';
 import { casosSchema } from '../utils/casosValidation.js';
 import { casosPatchSchema } from '../utils/dadosParciaisValidation.js';
+import { idSchema } from '../utils/idValidation.js';
 import { v4 as uuidv4 } from 'uuid';
-import { z, ZodError } from 'zod';
-
-const idSchema = z.string().uuid();
-
+import { ZodError } from 'zod';
 
 class ApiError extends Error {
     constructor(message, statusCode = 500) {
@@ -42,6 +40,8 @@ const getCaseById = (req, res, next) => {
 const createCase = (req, res, next) => {
     try {
         const data = casosSchema.parse(req.body);
+
+        //valida o agenteId antes de criar
         if (!agentesRepo.findById(data.agenteId)) {
             return next(new ApiError('Agente informado não existe.', 404));
         }
@@ -65,6 +65,8 @@ const updateCase = (req, res, next) => {
     try {
         const id = idSchema.parse(req.params.id);
         const data = casosSchema.parse(req.body);
+
+        //valida agenteId no update
         if (!agentesRepo.findById(data.agenteId)) {
             return next(new ApiError('Agente informado não existe.', 404));
         }
@@ -83,6 +85,8 @@ const patchCase = (req, res, next) => {
   try {
     const id = idSchema.parse(req.params.id);
     const partialData = casosPatchSchema.parse(req.body);
+
+    //se agente vier no patch, será validado aqui
     if (partialData.agenteId && !agentesRepo.findById(partialData.agenteId)) {
       return next(new ApiError('Agente informado não existe.', 404));
     }

@@ -1,7 +1,7 @@
 import z from 'zod';
 
 const casosSchema = z.object ({
-    title: z.string({ require_error: 'O título do caso é obrigatório.'}).min(10, 'O título do caso não pode ser vazio.'),
+    title: z.string({ required_error: 'O título do caso é obrigatório.'}).min(10, 'O título do caso não pode ser vazio.'),
     description: z.string({ require_error: 'A descrição do caso é obrigatória.'}).min(10, 'O título do caso não pode ser vazio.'),
     status: z.enum(['Aberto', 'Solucionado'], {
         required_error: 'O status do caso é obrigatório.',

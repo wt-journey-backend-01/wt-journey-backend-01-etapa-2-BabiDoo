@@ -14,8 +14,48 @@ class ApiError extends Error {
 
 const getAllAgents = (req, res, next) => {
     try {
-        const agents  = repository.findAll();
-        res.status(200).json(agents)
+        let agents  = repository.findAll();
+        const { cargo, sort } = req.query;
+        if (cargo) {
+          const cargoLower = cargo.toLowerCase();
+          agents = agents.filter((a) => {
+            if (!a.position) return false;
+            return a.position.toLowerCase() === cargoLower;
+      });
+    }
+    //ordena por data de incorporação
+    if (sort) {
+      let direction = 1;
+      let field = String(sort);
+
+      if (field.startsWith('-')) {
+        direction = -1;
+        field = field.slice(1);
+      }
+
+    const allowedFieldNames = ['dataDeIncorporacao', 'incorporationDate'];
+      if (!allowedFieldNames.includes(field)) {
+        return res.status(400).json({
+          status: 400,
+          message: 'Parâmetros inválidos',
+          errors:
+            "O parâmetro 'sort' deve ser 'dataDeIncorporacao' ou '-dataDeIncorporacao'."
+        });
+      }
+
+      agents = agents.slice().sort((a, b) => {
+        // garantir que a data seja Date
+        const da = a.incorporationDate instanceof Date
+          ? a.incorporationDate
+          : new Date(a.incorporationDate);
+        const db = b.incorporationDate instanceof Date
+          ? b.incorporationDate
+          : new Date(b.incorporationDate);
+
+        return (da - db) * direction;
+      });
+    }
+      res.status(200).json(agents)
     } catch (err) {
         return next( new ApiError ('Não foi possível listar os agentes.', 500));
     }
@@ -45,7 +85,7 @@ const createAgent = (req, res, next) => {
         const agent = repository.create(newAgent);
         res.status(201).json(agent);
     } catch (err) {
-        if (err instanceof z.ZodError) {
+        if (err instanceof ZodError) {
         return next(new ApiError('Não foi possível criar um agente.', 400));
       } 
         return next(new ApiError(err.message, 500));

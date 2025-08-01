@@ -1,168 +1,251 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 2 créditos restantes para usar o sistema de feedback AI.
+Você tem 9 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para BabiDoo:
 
-Nota final: **30.8/100**
+Nota final: **28.5/100**
 
-# Feedback para a BabiDoo 🚀💙
+# Feedback para a BabiDoo 🚀✨
 
-Oi Babi! Tudo bem? Primeiro, quero dizer que fiquei muito feliz em analisar seu projeto! Você já tem uma base muito boa, com uma estrutura modular legal, uso de `express.Router()`, validação com Zod e tratamento de erros com middlewares personalizados — isso mostra que você está no caminho certo! 🎉👏
+Oi Babi! Que jornada você encarou aqui! Primeiro, quero parabenizar você por todo o esforço e dedicação que deu para montar essa API para o Departamento de Polícia. 👏👏 É visível que você já tem um bom domínio do Express.js, da arquitetura modular e do uso do Zod para validação — isso é um baita avanço! 🎉
 
 ---
 
-## 🎉 Pontos Fortes que Você Mandou Bem
+## 🎯 Pontos Fortes que Merecem Destaque
 
-- Sua organização em **rotas**, **controladores** e **repositories** está bem clara e condiz com o esperado. Por exemplo, no arquivo `server.js` você já configurou direitinho as rotas:
+- **Organização do projeto:** Sua estrutura de pastas está certinha, com controllers, repositories, routes e utils bem separados. Isso é fundamental para manter o código limpo e escalável.  
+- **Uso correto do Express Router:** Nos arquivos `agentesRoutes.js` e `casosRoutes.js` você configurou as rotas com os métodos HTTP esperados, o que mostra que você entende a importância de modularizar as rotas.  
+- **Validação com Zod:** Você aplicou schemas para validar os dados de entrada e tratou erros com o middleware de erro personalizado, o que é ótimo para garantir a qualidade dos dados.  
+- **Tratamento de erros:** O uso da classe `ApiError` e o middleware `errorHandler` indicam que você está pensando no fluxo correto de erros e respostas HTTP.  
+- **Bônus conquistado:** Você implementou corretamente os retornos de status 400 para payloads incorretos e 404 para recursos inexistentes, o que é essencial para uma API robusta. Isso mostra cuidado com a experiência do consumidor da API.  
+
+Parabéns por esses pontos! 👏👏
+
+---
+
+## 🕵️ Análise Detalhada das Áreas para Melhorar
+
+### 1. IDs usados para agentes e casos não são UUIDs — Causa raiz dos erros de validação
+
+Ao analisar os dados iniciais em `repositories/agentesRepository.js`, percebi que os agentes usam a propriedade `agentId` como identificador, e os valores não seguem o padrão UUID esperado (além do nome da chave ser diferente do esperado `id`):
 
 ```js
-app.use('/agentes', agentesRoutes);
-app.use('/casos', casosRoutes);
-app.use(errorHandler);
+const agentes = [
+  {
+    "name": "Ana Silva",
+    "incorporationDate": "2024-07-15",
+    "position": "Delegado",
+    "agentId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"  // chave e valor problemáticos
+  },
+  // ... outros agentes
+];
 ```
 
-- O uso do Zod para validação dos dados está super correto, com schemas específicos para criação e atualização parcial. Isso ajuda muito a garantir a qualidade dos dados que entram na API!
-
-- Você implementou todos os métodos HTTP para os recursos `/agentes` e `/casos`, seguindo o padrão REST (GET, POST, PUT, PATCH, DELETE). Isso é fundamental!
-
-- Tratamento de erros com uma classe `ApiError` e middleware personalizado está bem estruturado, facilitando a manutenção.
-
-- Um bônus que você acertou foi a implementação da filtragem simples de casos por keywords no título e/ou descrição. Isso mostra que você está indo além do básico, parabéns! 🌟
-
----
-
-## 🕵️‍♂️ Onde Precisamos Dar Uma Atenção Especial (Causas Raiz)
-
-### 1. IDs usados para agentes e casos não são UUIDs válidos
-
-Vi que seu código gera IDs usando o `uuidv4()`, o que é ótimo, porém a penalidade indica que os IDs usados não são UUIDs válidos. Isso geralmente acontece quando:
-
-- Ou o ID não está sendo gerado corretamente (mas pelo seu código parece certo, você usa `uuidv4()` na criação).
-- Ou os testes estão enviando IDs que não são UUIDs, e seu código não está validando isso corretamente.
-- Ou você está aceitando IDs que não são UUIDs em algum ponto.
-
-No seu código, você tem um schema de validação para ID:
+Já nos controllers, você está usando o campo `id` para procurar agentes, por exemplo:
 
 ```js
-import { idSchema } from '../utils/idValidation.js';
+const agent = repository.findById(id);
 ```
 
-Mas não mostrou o conteúdo desse arquivo. É fundamental que esse schema valide que o ID seja um UUID válido, por exemplo, usando o Zod assim:
+E no repositório:
 
 ```js
-import { z } from 'zod';
-
-export const idSchema = z.string().uuid();
+const findById = (id) => agentes.find((a) => a.agentId === id);
 ```
 
-**Se o seu `idSchema` não está validando UUIDs, esse é o principal motivo das penalidades.**
+Aqui temos dois problemas importantes:
 
-👉 **Recomendo revisar seu schema `idValidation.js` para garantir que ele valide UUIDs usando `z.string().uuid()`.**
+- **Nome do campo inconsistente:** No repositório você usa `agentId`, mas o padrão esperado e usado no controller e criação é `id`. Isso gera confusão e falha na busca.  
+- **Formato do ID:** Os valores que você colocou em `agentId` parecem UUIDs, mas não são válidos ou consistentes com o que o Zod espera. Além disso, o código cria novos agentes com `id: uuidv4()`, mas o repositório não está alinhado para armazenar e buscar por esse campo `id`.  
 
----
-
-### 2. Falha em vários testes básicos de CRUD para `/casos`
-
-Notei que muitos testes relacionados a criação, leitura, atualização e exclusão de casos falharam. Ao analisar seu código, percebo que você implementou todos os endpoints no arquivo `routes/casosRoutes.js` e os controladores em `controllers/casosController.js` — isso é ótimo!
-
-Porém, a raiz dos erros pode estar em:
-
-- **Validação do `agenteId` no payload dos casos:** Você faz a validação da existência do agente antes de criar ou atualizar um caso, o que é correto:
+O mesmo acontece em `repositories/casosRepository.js`, onde os casos não possuem campo `id` inicial (não existe `id` nos objetos), apenas `responsibleAgentId`:
 
 ```js
-if (!agentesRepo.findById(data.agenteId)) {
-    return next(new ApiError('Agente informado não existe.', 404));
-}
+const casos = [
+  {
+    "title": "Homicídio no centro",
+    "description": "...",
+    "status": "Aberto",
+    "responsibleAgentId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"  // não existe campo `id`
+  },
+  // ...
+];
 ```
 
-Mas será que o repositório de agentes está com dados reais? Como os dados ficam em memória, se você não criou nenhum agente antes de criar casos, essa validação sempre falhará, bloqueando a criação de casos.
+Porém, os controllers esperam que cada caso tenha um campo `id` para identificar unicamente (usado em `findById`, `update`, etc). Isso causa falha ao tentar buscar ou alterar casos pelo ID.
 
-- **Ausência de agentes na memória:** Se você tentar criar um caso com um `agenteId` que não existe no array `agentes` do `agentesRepository.js`, o caso não será criado.
+**👉 O que fazer?**
 
-👉 **Para resolver, teste primeiro criando agentes, garantindo que o array `agentes` tenha elementos válidos. Assim, o `agenteId` passado para os casos será válido.**
-
----
-
-### 3. Falta de persistência entre as requisições (dados em memória)
-
-Você está armazenando os dados em arrays dentro dos repositories, o que é correto para o desafio. Porém, lembre-se que esses arrays começam vazios a cada execução do servidor.
-
-Se você está testando a API criando casos antes de criar agentes, ou buscando dados que não existem, vai receber 404.
-
-👉 **Sugestão:** Ao testar, crie agentes primeiro, depois crie casos usando os IDs desses agentes. Isso vai evitar erros 404 por agentes inexistentes.
-
----
-
-### 4. Validação de payloads e tratamento de erros
-
-Você fez um bom trabalho tratando erros de validação com Zod e retornando status 400 para payloads inválidos, o que é ótimo! Por exemplo:
+- Padronize o nome do campo identificador para **`id`** tanto em agentes quanto em casos.  
+- Garanta que todos os objetos iniciais tenham o campo `id` com valores UUID válidos.  
+- Exemplo para agentes:
 
 ```js
-if (err instanceof ZodError) {
-  return next(new ApiError(err.message, 400));
-}
+const agentes = [
+  {
+    id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    name: "Ana Silva",
+    incorporationDate: "2024-07-15",
+    position: "Delegado"
+  },
+  // demais agentes...
+];
 ```
 
-Só fique atento para garantir que as mensagens de erro sejam claras e consistentes, e que o middleware de erro (`errorHandler`) esteja corretamente configurado para capturar e enviar essas respostas.
-
----
-
-### 5. Falta de implementação dos filtros e buscas mais complexas
-
-Você conseguiu implementar o filtro simples por keywords nos casos, o que é excelente para um bônus! Porém, os filtros mais complexos, como por status, por agente, e ordenação por data de incorporação dos agentes, ainda não foram implementados.
-
-👉 **Dica:** Para implementar esses filtros, você pode usar funções como `filter()`, `sort()` e `includes()` nos arrays dos repositories, combinando com query params recebidos nas rotas.
-
----
-
-## 📚 Recursos para Você Aprofundar e Melhorar Ainda Mais
-
-- **Validação de UUID com Zod:**  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_ (vídeo sobre validação de dados em APIs Node.js/Express)  
-  Documentação Zod para UUID: https://github.com/colinhacks/zod#stringuuid
-
-- **Arquitetura MVC e organização de projetos Node.js:**  
-  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
-
-- **Fundamentos de API REST e Express.js:**  
-  https://youtu.be/RSZHvQomeKE  
-  https://expressjs.com/pt-br/guide/routing.html
-
-- **Manipulação de arrays para filtros:**  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
-
----
-
-## 💡 Sugestão de Melhoria no Código para Validar UUID
-
-No seu arquivo `utils/idValidation.js`, garanta que seu schema seja assim:
+- Exemplo para casos:
 
 ```js
-import { z } from 'zod';
-
-export const idSchema = z.string().uuid();
+const casos = [
+  {
+    id: "algum-uuid-valido-aqui",
+    title: "Homicídio no centro",
+    description: "...",
+    status: "Aberto",
+    agenteId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  // demais casos...
+];
 ```
 
-Assim, toda vez que um ID for recebido via params, ele será validado como um UUID válido, evitando erros e penalidades.
+- Altere as funções do repositório para buscar pelo campo `id`, e ajuste os nomes dos campos relacionados (ex: `agenteId` ao invés de `responsibleAgentId` para manter padrão).
+
+Esse alinhamento é fundamental para que as buscas, atualizações e deleções funcionem corretamente e para que os testes de validação de UUID passem.
 
 ---
 
-## 📝 Resumo Rápido para Você Focar
+### 2. Inconsistência nos nomes das propriedades dos objetos
 
-- 🔑 **Valide IDs como UUIDs usando o Zod (`z.string().uuid()`).**  
-- 🔑 **Crie agentes antes de criar casos para garantir que `agenteId` exista na memória.**  
-- 🔑 **Revise o fluxo de criação e consulta para garantir que dados em memória existam quando você os busca.**  
-- 🔑 **Implemente filtros mais avançados e ordenação para melhorar a API e conquistar bônus.**  
-- 🔑 **Mantenha o tratamento de erros consistente e mensagens claras para o cliente da API.**
+Além do problema do campo `id`, percebi que há diferenças nos nomes das propriedades entre o que o controller espera e o que está no repositório.
+
+Por exemplo, no repositório dos agentes você tem `agentId`, mas no controller você cria agentes com `id`.
+
+No repositório dos casos, o campo do agente responsável é `responsibleAgentId`, enquanto no controller você usa `agenteId` (note que no controller você valida `data.agenteId`).
+
+**👉 Para resolver:**
+
+- Harmonize os nomes das propriedades para que sejam os mesmos em todos os lugares (repos, controllers e validações).  
+- Por exemplo, use `id` para o identificador do objeto e `agenteId` para relacionar o agente responsável em casos.  
 
 ---
 
-Babi, você está construindo uma base muito sólida e já mostrou que sabe organizar seu código e usar boas práticas. Com essas pequenas correções e atenção aos detalhes que te mostrei, tenho certeza que sua API vai ficar impecável! 🚀✨
+### 3. Dados iniciais dos arrays não possuem IDs para os casos
 
-Continue firme, você está indo muito bem! Se precisar, volte a esses recursos que te passei e não hesite em perguntar. Estou aqui para te ajudar!
+Como mencionei, os casos não têm campo `id`. Isso impede que você consiga buscar, atualizar ou deletar casos pelo ID, pois as funções do repositório procuram por `id`:
 
-Um abraço de Code Buddy 🤖💙
+```js
+const findById = (id) => casos.find((c) => c.id === id);
+```
+
+Sem o campo `id`, o resultado será sempre `undefined`.
+
+**👉 Solução:** Adicione o campo `id` com UUIDs válidos para todos os casos no array inicial.
+
+---
+
+### 4. Campos de data e seus nomes inconsistentes
+
+No controller dos agentes, você filtra e ordena pelo campo `incorporationDate`:
+
+```js
+const allowedFieldNames = ['dataDeIncorporacao', 'incorporationDate'];
+```
+
+Mas no repositório dos agentes, o campo está como `incorporationDate` (em inglês). No entanto, em seu filtro você também aceita `dataDeIncorporacao` (em português).
+
+Escolha um padrão e mantenha em todo o projeto para evitar confusão.
+
+---
+
+### 5. Filtros e funcionalidades bônus não implementadas completamente
+
+Você já começou a implementar filtros no controller dos agentes, o que é ótimo! Mas os testes indicam que os filtros para casos por status, agente responsável e keywords, além da ordenação complexa, não foram implementados.
+
+Isso não impacta o funcionamento básico, mas é uma oportunidade para você crescer! 😉
+
+---
+
+## 📚 Recursos para te ajudar a corrigir esses pontos
+
+- Para entender melhor a arquitetura MVC e organização de arquivos:  
+  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH  
+
+- Para manipular arrays e objetos em memória:  
+  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
+
+- Para validação de dados e tratamento de erros com status HTTP:  
+  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
+
+- Para compreender o protocolo HTTP e status codes:  
+  https://youtu.be/RSZHvQomeKE?si=PSkGqpWSRY90Ded5  
+
+---
+
+## 💡 Dicas Práticas para Ajustar seu Código
+
+### Exemplo de ajuste no repositório de agentes:
+
+```js
+const agentes = [
+  {
+    id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    name: "Ana Silva",
+    incorporationDate: "2024-07-15",
+    position: "Delegado"
+  },
+  // demais agentes
+];
+
+const findById = (id) => agentes.find((a) => a.id === id);
+
+const create = (agente) => {
+  agentes.push(agente);
+  return agente;
+};
+
+// demais funções atualizadas para usar `id` ao invés de `agentId`
+```
+
+### Exemplo de ajuste no repositório de casos:
+
+```js
+const casos = [
+  {
+    id: "uuid-valido-para-caso-1",
+    title: "Homicídio no centro",
+    description: "...",
+    status: "Aberto",
+    agenteId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  // demais casos
+];
+
+const findById = (id) => casos.find((c) => c.id === id);
+
+// demais funções usando `id` e `agenteId`
+```
+
+---
+
+## 🔎 Resumo Rápido dos Principais Pontos para Focar
+
+- Padronize o campo identificador para **`id`** em agentes e casos, e garanta que todos os objetos iniciais tenham UUIDs válidos.  
+- Alinhe os nomes dos campos relacionados ao agente nos casos (ex: `agenteId`), para que sejam consistentes entre repositórios e controllers.  
+- Adicione o campo `id` nos casos do array inicial para que buscas e atualizações funcionem.  
+- Mantenha consistência nos nomes dos campos de data e outros atributos para evitar confusão.  
+- Revise os filtros e funcionalidades bônus para implementar os filtros por status, agente, keywords e ordenação corretamente.  
+
+---
+
+## Para Finalizar 🌟
+
+Babi, você está no caminho certo! Seu projeto já tem uma base sólida, boas práticas e organização. Os problemas que encontrei são comuns e fazem parte do processo de aprendizado, especialmente quando trabalhamos com dados em memória e validação.  
+
+Corrigindo os pontos que te mostrei, sua API vai ficar muito mais robusta e alinhada com o que se espera de uma aplicação RESTful. Continue firme, porque você tem tudo para mandar muito bem! 🚀💪
+
+Se precisar de ajuda para entender UUIDs, manipulação de arrays ou validação com Zod, não hesite em estudar os recursos que te passei e me chamar para qualquer dúvida. Vou adorar acompanhar sua evolução!
+
+Um abraço de Code Buddy! 🤖💙✨
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 

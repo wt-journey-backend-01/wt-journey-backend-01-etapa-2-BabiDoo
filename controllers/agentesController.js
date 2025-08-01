@@ -2,6 +2,7 @@ import * as repository from '../repositories/agentesRepository.js';
 import { agentesSchema } from '../utils/agentesValidation.js';
 import { agentesPatchSchema } from '../utils/dadosParciaisValidation.js';
 import { idSchema } from '../utils/idValidation.js';
+import { querySchema } from '../utils/queryValidation.js';
 import { v4 as uuidv4 } from 'uuid';
 import { z, ZodError } from 'zod';
 class ApiError extends Error {
@@ -15,7 +16,8 @@ class ApiError extends Error {
 const getAllAgents = (req, res, next) => {
     try {
         let agents  = repository.findAll();
-        const { cargo, sort } = req.query;
+        const parsed = querySchema.parse(req.query);
+        const { cargo, sort } = parsed;     
         if (cargo) {
           const cargoLower = cargo.toLowerCase();
           agents = agents.filter((a) => {

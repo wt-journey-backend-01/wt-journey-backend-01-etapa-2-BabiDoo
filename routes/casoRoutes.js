@@ -1,5 +1,5 @@
 import express from 'express';
-import * as controller from '../controllers/caseController.js';
+import * as controller from '../controllers/casoController.js';
 
 const caseRouter = express.Router();
 

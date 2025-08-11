@@ -1,4 +1,4 @@
-import * as repository from '../repositories/caseRepository.js';
+import * as repository from '../repositories/casoRepository.js';
 import { caseSchema } from '../utils/caseValidation.js';
 import { casePatchSchema } from '../utils/partialDataValidation.js';
 

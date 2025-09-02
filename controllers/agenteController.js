@@ -1,79 +1,80 @@
 import * as repository from '../repositories/agenteRepository.js';
 import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
+import { ZodError } from 'zod';
 
 class ApiError extends Error {
-    constructor(message, statusCode = 500) {
-        super(message);
-        this.name = 'ApiError';
-        this.statusCode = statusCode;
-    }
+  constructor(message, statusCode = 500) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = statusCode;
+  }
 }
 
-const getAllAgents = (req, res, next) => {
-    try {
-        const agents  = repository.findAll();
-        res.status(200).json(agents)
-    } catch (error) {
-        next( new ApiError ('Não foi possível listar os agentes'));
-    }
+export const getAllAgents = (req, res, next) => {
+  try {
+    const agents = repository.findAll();
+    return res.status(200).json(agents);
+  } catch {
+    return next(new ApiError('Não foi possível listar os agentes.'));
+  }
 };
 
-const getAgentById = (req, res, next) => {
-  const { id } = req.params;
+export const getAgentById = (req, res, next) => {
   try {
+    const { id } = req.params;
     const agent = repository.findById(id);
     if (!agent) return next(new ApiError('Agente não encontrado.', 404));
-    res.status(200).json(agent);
-  } catch (error) {
-    next(new ApiError(error.message, 500));
+    return res.status(200).json(agent);
+  } catch {
+    return next(new ApiError('Erro ao buscar o agente.'));
   }
 };
 
-const createAgent = (req, res, next) => {
-    try {
-        const data = agentSchema.parse(req.body);
-        const agent = repository.create(data);
-        res.status(201).json(agent);
-    } catch (error) {
-        next(new ApiError('Não foi possível criar um agente', 400));
-    }
-};
-
-const updateAgent = (req, res, next) => {
-    const { id } = req.params;
-    try {
-        const data = agentSchema.parse(req.body);
-        const updated = repository.update(id, data);
-        if (!updated) return next(new ApiError('Agente não encontrado.', 404));
-        res.status(200).json(updated);
-    } catch (error) {
-        next(new ApiError('Erro ao atualizar o agente.', 400));
-    }
-};
-
-const patchAgent = (req, res, next) => {
-  const { id } = req.params;
+export const createAgent = (req, res, next) => {
   try {
-    const partialData = agentPatchSchema.parse(req.body);
-    const updated = repository.patch(id, partialData);
-    if (!updated) return next(new ApiError('Agente não encontrado.', 404));
-    res.status(200).json(updated);
-  } catch (error) {
-    next(new ApiError('Erro ao atualizar o agente', 400));
+    const data = agentSchema.parse(req.body);
+    const created = repository.create(data);
+    return res.status(201).json(created);
+  } catch (err) {
+    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    return next(new ApiError('Erro ao criar o agente.'));
   }
 };
 
-
-const deleteAgent = (req, res, next) => {
+export const updateAgent = (req, res, next) => {
+  try {
     const { id } = req.params;
-    try {
-        const deleted = repository.remove(id);
-        if (!deleted) return next(new ApiError('Agente não encontrado.', 404));
-        res.sendStatus(204);
-    } catch (error) {
-        next(new ApiError('Erro ao deletar agente.'));
-    }
+    const data = agentSchema.parse(req.body);
+    const updated = repository.update(id, data);
+    if (!updated) return next(new ApiError('Agente não encontrado.', 404));
+    return res.status(200).json(updated);
+  } catch (err) {
+    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    return next(new ApiError('Erro ao atualizar o agente.'));
+  }
 };
 
-export { getAllAgents, getAgentById, createAgent, updateAgent, patchAgent, deleteAgent };
+export const patchAgent = (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const partial = agentPatchSchema.parse(req.body);
+    const patched = repository.patch(id, partial);
+    if (!patched) return next(new ApiError('Agente não encontrado.', 404));
+    return res.status(200).json(patched);
+  } catch (err) {
+    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    return next(new ApiError('Erro ao atualizar o agente.'));
+  }
+};
+
+export const deleteAgent = (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deleted = repository.remove(id);
+    if (!deleted) return next(new ApiError('Agente não encontrado.', 404));
+    return res.sendStatus(204);
+  } catch {
+    return next(new ApiError('Erro ao deletar agente.'));
+  }
+};

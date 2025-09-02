@@ -2,6 +2,7 @@ import * as repository from '../repositories/casosRepository.js';
 import * as agentesRepo from '../repositories/agentesRepository.js';
 import { caseSchema } from '../utils/caseValidation.js';
 import { casePatchSchema } from '../utils/partialDataValidation.js';
+import { casosQuerySchema } from '../utils/querySchemas.js';
 import { ZodError } from 'zod';
 
 class ApiError extends Error {
@@ -14,9 +15,11 @@ class ApiError extends Error {
 
 export const getAllCases = (req, res, next) => {
   try {
-    const items = repository.findAll();
+    const filters = casosQuerySchema.parse(req.query);
+    const items = repository.findAll(filters);
     return res.status(200).json(items);
-  } catch {
+    } catch (err) {
+    if (err instanceof ZodError) return next(new ApiError('Parâmetros de consulta inválidos.', 400));
     return next(new ApiError('Não foi possível listar os casos'));
   }
 };

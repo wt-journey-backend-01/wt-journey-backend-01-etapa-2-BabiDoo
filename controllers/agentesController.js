@@ -1,7 +1,6 @@
 import * as repository from '../repositories/agentesRepository.js';
 import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
-import { agentesQuerySchema } from '../utils/querySchemas.js';
 import { ZodError } from 'zod';
 
 class ApiError extends Error {
@@ -14,8 +13,7 @@ class ApiError extends Error {
 
 export const getAllAgents = (req, res, next) => {
   try {
-    const { sort } = agentesQuerySchema.parse(req.query);
-    const agents = repository.findAll({ sort });
+    const agents = repository.findAll();
     return res.status(200).json(agents);
     } catch (err) {
     if (err instanceof ZodError) return next(new ApiError('Parâmetros de consulta inválidos.', 400));

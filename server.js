@@ -1,7 +1,7 @@
 import 'dotenv/config'; //middleware de config da biblioteca dotenv
 import express from 'express';
-import agentRoutes from './routes/agenteRoutes.js';
-import caseRoutes from './routes/casoRoutes.js';
+import agentRoutes from './routes/agentesRoutes.js';
+import caseRoutes from './routes/casosRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000; //usa a variavel PORT que esta definida no arquivo .env

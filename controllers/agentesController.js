@@ -1,4 +1,4 @@
-import * as repository from '../repositories/agenteRepository.js';
+import * as repository from '../repositories/agentesRepository.js';
 import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
 import { ZodError } from 'zod';

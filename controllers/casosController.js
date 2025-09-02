@@ -1,5 +1,5 @@
-import * as repository from '../repositories/casoRepository.js';
-import * as agentesRepo from '../repositories/agenteRepository.js';
+import * as repository from '../repositories/casosRepository.js';
+import * as agentesRepo from '../repositories/agentesRepository.js';
 import { caseSchema } from '../utils/caseValidation.js';
 import { casePatchSchema } from '../utils/partialDataValidation.js';
 import { ZodError } from 'zod';

@@ -30,6 +30,9 @@ export const getAgentById = (req, res, next) => {
   } catch {
     return next(new ApiError('Erro ao buscar o agente.'));
   }
+
+
+  
 };
 
 export const createAgent = (req, res, next) => {

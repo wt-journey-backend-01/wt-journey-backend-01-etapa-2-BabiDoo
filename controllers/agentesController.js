@@ -28,10 +28,10 @@ export const getAllAgents = (req, res, next) => {
 };
 
 export const getAgentById = (req, res, next) => {
+  const { id } = req.params;
+  const agent = repository.findById(id);
+  if (!agent) return next(new ApiError('Agente não encontrado.', 404));
   try {
-    const { id } = req.params;
-    const agent = repository.findById(id);
-    if (!agent) return next(new ApiError('Agente não encontrado.', 404));
     return res.status(200).json(agent);
   } catch {
     return next(new ApiError('Erro ao buscar o agente.'));
@@ -60,11 +60,10 @@ export const updateAgent = (req, res, next) => {
   } catch {
     return next(new ApiError("Agente não encontrado.", 404));
   }
-
+  const current = repository.findById(id);
+  console.log(current);
+  if (!current) return next(new ApiError("Agente não encontrado.", 404));
   try {
-    const current = repository.findById(id);
-    console.log(current);
-    if (!current) return next(new ApiError("Agente não encontrado.", 404));
     const candidate = { ...current, ...req.body };
     console.log('updating agentes')
     console.log(candidate);

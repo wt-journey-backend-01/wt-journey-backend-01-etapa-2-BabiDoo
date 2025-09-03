@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-export const agentSchema = z.object({
-  nome: z
-    .string({ required_error: 'Nome é obrigatório.' })
+export const agentSchema = z
+.object({
+  nome: z.string({ required_error: 'Nome é obrigatório.' })
     .min(1, 'Nome não pode ser vazio.')
     .regex(/^[\p{L}\s.'-]+$/u, 'Use apenas letras.'),
   dataDeIncorporacao: z
@@ -11,6 +11,5 @@ export const agentSchema = z.object({
   cargo: z.enum(['inspetor', 'delegado'], {
     required_error: 'O cargo é obrigatório.',
     invalid_type_error: 'O cargo deve ser "inspetor" ou "delegado".',
-  }),
-  agente_id: z.uuid({ message: 'agente_id deve ser um uuid válido.' })
-});
+  })
+}).strict();

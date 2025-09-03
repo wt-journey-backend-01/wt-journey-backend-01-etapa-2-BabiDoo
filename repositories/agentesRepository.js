@@ -7,23 +7,23 @@ const findAll = () => agents;
 const findById = (id) => agents.find((a) => a.id === id);
 
 const create = (data) => {
-  const newAgent = { ...data, id: uuidv4() }; //cria agentes com uuidv4()
+  const newAgent = { ...data, id: uuidv4() };
   agents.push(newAgent);
   return newAgent;
 };
 
 const update = (id, data) => {
-  const index = agents.findIndex((a) => a.id === id);
-  if (index === -1) return null;
-  agents[index] = { ...data, id };
-  return agents[index];
+  const i = agents.findIndex(a => a.id === id);
+  if (i === -1) return null;
+  agents[i] = { ...data, id }; 
+  return agents[i];
 };
 
-const patch = (id, partialData) => {
-  const index = agents.findIndex((a) => a.id === id);
-  if (index === -1) return null;
-  agents[index] = { ...agents[index], ...partialData };
-  return agents[index];
+const patch = (id, partial) => {
+  const i = agents.findIndex(a => a.id === id);
+  if (i === -1) return null;
+  agents[i] = { ...agents[i], ...partial }; 
+  return agents[i];
 };
 
 const remove = (id) => {

@@ -58,7 +58,10 @@ export const updateCase = (req, res, next) => {
     if (!updated) return next(new ApiError('Caso não encontrado.', 404));
     return res.status(200).json(updated);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    if (err instanceof ZodError) {
+      console.log(err)
+      return next(new ApiError('Parâmetros inválidos.', 400));
+    }
     return next(new ApiError('Erro ao atualizar o caso.'));
   }
 };

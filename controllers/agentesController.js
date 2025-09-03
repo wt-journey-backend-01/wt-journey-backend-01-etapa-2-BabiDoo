@@ -16,7 +16,10 @@ export const getAllAgents = (req, res, next) => {
     const agents = repository.findAll();
     return res.status(200).json(agents);
     } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros de consulta inválidos.', 400));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError('Parâmetros de consulta inválidos.', 400));
+    } 
     return next(new ApiError('Não foi possível listar os agentes.'));
   }
 };
@@ -32,16 +35,18 @@ export const getAgentById = (req, res, next) => {
   }
 
 
-  
+
 };
 
 export const createAgent = (req, res, next) => {
-  try {
+  try { 
     const data = agentSchema.parse(req.body);
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError('Parâmetros inválidos.', 400))};
     return next(new ApiError('Erro ao criar o agente.'));
   }
 };

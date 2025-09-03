@@ -4,9 +4,9 @@ import { requireUuidParam } from '../utils/requireUuidParam.js';
 
 const caseRouter = express.Router();
 
-caseRouter.get('/', requireUuidParam('id'), controller.getAllCases);
+caseRouter.get('/', controller.getAllCases);
+caseRouter.post('/', controller.createCase);
 caseRouter.get('/:id', requireUuidParam('id'), controller.getCaseById);
-caseRouter.post('/', requireUuidParam('id'), controller.createCase);
 caseRouter.put('/:id', requireUuidParam('id'), controller.updateCase);
 caseRouter.patch('/:id', requireUuidParam('id'), controller.patchCase);
 caseRouter.delete('/:id', requireUuidParam('id'), controller.deleteCase);

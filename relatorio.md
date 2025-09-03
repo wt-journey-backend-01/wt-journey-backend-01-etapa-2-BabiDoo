@@ -2,7 +2,7 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - BabiDoo
 
-**Data:** 03/09/2025 18:05
+**Data:** 03/09/2025 18:17
 
 **Nota Final:** `67.45/100`
 **Status:** ❌ Reprovado

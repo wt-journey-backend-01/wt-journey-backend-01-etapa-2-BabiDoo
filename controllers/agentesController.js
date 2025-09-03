@@ -40,6 +40,7 @@ export const getAgentById = (req, res, next) => {
 
 export const createAgent = (req, res, next) => {
   try { 
+    req.body.cargo = req.body.cargo.toLowerCase();
     const data = agentSchema.parse(req.body);
     const created = repository.create(data);
     return res.status(201).json(created);
@@ -54,6 +55,7 @@ export const createAgent = (req, res, next) => {
 export const updateAgent = (req, res, next) => {
   try {
     const { id } = req.params;
+    req.body.cargo = req.body.cargo.toLowerCase();
     const data = agentSchema.parse(req.body);
     const updated = repository.update(id, data);
     if (!updated) return next(new ApiError('Agente não encontrado.', 404));
@@ -69,6 +71,7 @@ export const updateAgent = (req, res, next) => {
 export const patchAgent = (req, res, next) => {
   try {
     const { id } = req.params;
+    req.body.cargo = req.body.cargo.toLowerCase();
     const partial = agentPatchSchema.parse(req.body);
     const patched = repository.patch(id, partial);
     if (!patched) return next(new ApiError('Agente não encontrado.', 404));

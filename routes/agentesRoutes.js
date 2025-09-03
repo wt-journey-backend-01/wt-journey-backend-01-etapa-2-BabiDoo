@@ -152,7 +152,7 @@ const agentRouter = express.Router();
 
 agentRouter.get('/', controller.getAllAgents); // sem requireUuidParam
 agentRouter.post('/', controller.createAgent); // sem requireUuidParam
-agentRouter.get('/:id', requireUuidParam('id'), controller.getAgentById);
+agentRouter.get('/:id', controller.getAgentById);
 agentRouter.put('/:id', requireUuidParam('id'), controller.updateAgent);
 agentRouter.patch('/:id', requireUuidParam('id'), controller.patchAgent);
 agentRouter.delete('/:id', requireUuidParam('id'), controller.deleteAgent);

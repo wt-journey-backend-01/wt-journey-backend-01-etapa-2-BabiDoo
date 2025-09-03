@@ -29,7 +29,6 @@ export const getAllAgents = (req, res, next) => {
 
 export const getAgentById = (req, res, next) => {
   console.log('ID recebido:', req.params.id);
-
   let id;
   try {
     ({ id } = idSchema.parse(req.params));

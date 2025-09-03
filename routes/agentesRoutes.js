@@ -150,9 +150,9 @@ const agentRouter = express.Router();
  *       '404': { description: Agente não encontrado, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
  */
 
-agentRouter.get('/', controller.getAllAgents); // sem requireUuidParam
-agentRouter.post('/', controller.createAgent); // sem requireUuidParam
-agentRouter.get('/:id', controller.getAgentById);
+agentRouter.get('/', controller.getAllAgents); 
+agentRouter.post('/', controller.createAgent);
+agentRouter.get('/:id', requireUuidParam('id'), controller.getAgentById);
 agentRouter.put('/:id', requireUuidParam('id'), controller.updateAgent);
 agentRouter.patch('/:id', requireUuidParam('id'), controller.patchAgent);
 agentRouter.delete('/:id', requireUuidParam('id'), controller.deleteAgent);

@@ -1,7 +1,9 @@
 import * as repository from '../repositories/agentesRepository.js';
 import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
-import { ZodError } from 'zod';
+import { ZodError, z } from 'zod';
+
+const idSchema = z.object({ id: z.uuid() });
 
 class ApiError extends Error {
   constructor(message, statusCode = 500) {
@@ -10,6 +12,7 @@ class ApiError extends Error {
     this.statusCode = statusCode;
   }
 }
+
 
 export const getAllAgents = (req, res, next) => {
   try {

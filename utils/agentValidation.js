@@ -9,6 +9,6 @@ export const agentSchema = z
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'A data deve estar no formato YYYY-MM-DD.'),
   cargo: z.enum(['Inspetor', 'Delegado'], {
     required_error: 'O cargo é obrigatório.',
-    invalid_type_error: 'O cargo deve ser "Inspetor" ou "Delegado".',
+    invalid_type_error: 'O cargo deve ser "inspetor" ou "delegado".',
   })
 }).strict();

@@ -43,14 +43,11 @@ export const getAgentById = (req, res, next) => {
 
 export const createAgent = (req, res, next) => {
   try {
-    console.log("Barbara created")
-    console.log(req.body);
     const data = agentSchema.parse(req.body);
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
     if (err instanceof ZodError) {
-      console.log(err);
       return next(new ApiError('Parâmetros inválidos.', 400))};
     return next(new ApiError('Erro ao criar o agente.'));
   }
@@ -105,12 +102,17 @@ export const patchAgent = (req, res, next) => {
 };
 
 export const deleteAgent = (req, res, next) => {
+  let id;
+  try {
+    ({ id } = idSchema.parse(req.params));
+  } catch {
+    return next(new ApiError("Agente não encontrado.", 404));
+  }
+  const current = repository.findById(id);
+  if (!current) return next(new ApiError("Agente não encontrado.", 404));
   try {
     const { id } = req.params;
     const deleted = repository.remove(id);
-    if (err instanceof ZodError) {
-      console.log(err);
-      return next(new ApiError('Parâmetros inválidos.', 400))};
     return res.sendStatus(204);
   } catch {
     return next(new ApiError('Erro ao deletar agente.'));

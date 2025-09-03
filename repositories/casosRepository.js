@@ -7,7 +7,7 @@ const findAll = () => cases;
 const findById = (id) => cases.find((c) => c.id === id);
 
 const create = (data) => {
-  const newCase = { id: uuidv4(), ...data }; //cria agentes com uuidv4()
+  const newCase = { id: uuidv4(), ...data }; //cria casos com uuidv4()
   cases.push(newCase);
   return newCase;
 };

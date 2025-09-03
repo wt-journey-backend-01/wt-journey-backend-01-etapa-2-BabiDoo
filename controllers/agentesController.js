@@ -28,6 +28,7 @@ export const getAllAgents = (req, res, next) => {
 };
 
 export const getAgentById = (req, res, next) => {
+  console.log(req.params.id)
   let id;
   try {
     ({ id } = idSchema.parse(req.params));
@@ -60,22 +61,18 @@ export const createAgent = (req, res, next) => {
 
 export const updateAgent = (req, res, next) => {
   let id;
-  console.log('updating agentes: ', req.body)
   try {
     ({ id } = idSchema.parse(req.params));
   } catch {
     return next(new ApiError("Agente não encontrado.", 404));
   }
   const current = repository.findById(id);
-  console.log(current);
   if (!current) return next(new ApiError("Agente não encontrado.", 404));
   try {
     // const candidate = { ...current, ...req.body };
-    console.log('updating agentes')
     // console.log(candidate);
     const data = agentSchema.parse(req.body);
     const updated = repository.update(id, data);
-    console.log('updated: ', updated);
     return res.status(200).json(updated);
   } catch (err) {
     if (err instanceof ZodError) {

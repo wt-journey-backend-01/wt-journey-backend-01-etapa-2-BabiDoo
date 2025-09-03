@@ -14,7 +14,7 @@ export const agentSchema = z
 }).strict();
 
 
-export const agentPutValidation = z
+export const agentPatchValidation = z
 .object({
   nome: z.string({ required_error: 'Nome é obrigatório.' })
     .regex(/^[\p{L}\s.'-]+$/u, 'Use apenas letras.'),

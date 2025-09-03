@@ -59,7 +59,9 @@ export const updateAgent = (req, res, next) => {
     if (!updated) return next(new ApiError('Agente não encontrado.', 404));
     return res.status(200).json(updated);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError('Parâmetros inválidos.', 400))};
     return next(new ApiError('Erro ao atualizar o agente.'));
   }
 };
@@ -72,7 +74,9 @@ export const patchAgent = (req, res, next) => {
     if (!patched) return next(new ApiError('Agente não encontrado.', 404));
     return res.status(200).json(patched);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError('Parâmetros inválidos.', 400))};
     return next(new ApiError('Erro ao atualizar o agente.'));
   }
 };
@@ -81,7 +85,9 @@ export const deleteAgent = (req, res, next) => {
   try {
     const { id } = req.params;
     const deleted = repository.remove(id);
-    if (!deleted) return next(new ApiError('Agente não encontrado.', 404));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError('Parâmetros inválidos.', 400))};
     return res.sendStatus(204);
   } catch {
     return next(new ApiError('Erro ao deletar agente.'));

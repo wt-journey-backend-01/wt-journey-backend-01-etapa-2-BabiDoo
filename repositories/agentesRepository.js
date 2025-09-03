@@ -14,8 +14,10 @@ const create = (data) => {
 
 const update = (id, data) => {
   const i = agents.findIndex(a => a.id === id);
+  console.log('indice: ', i);
   if (i === -1) return null;
-  agents[i] = { ...data, id }; 
+  agents[i] = { ...data, id };
+  console.log('agente: ', agents[i]);
   return agents[i];
 };
 

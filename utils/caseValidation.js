@@ -11,7 +11,5 @@ export const caseSchema = z.object({
     required_error: 'O status do caso é obrigatório.',
     invalid_type_error: 'Status deve ser "aberto" ou "solucionado".',
   }),
-  agente_id: z
-    .string({ required_error: 'Uma autoridade responsável é obrigatória.' })
-    .uuid('agente_id deve ser um uuid válido.'),
+  caso_id: z.uuid({ message: 'caso_id deve ser um uuid válido.' })
 });

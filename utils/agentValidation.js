@@ -12,4 +12,5 @@ export const agentSchema = z.object({
     required_error: 'O cargo é obrigatório.',
     invalid_type_error: 'O cargo deve ser "inspetor" ou "delegado".',
   }),
+  agente_id: z.uuid({ message: 'agente_id deve ser um uuid válido.' })
 });

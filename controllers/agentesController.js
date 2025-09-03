@@ -41,8 +41,6 @@ export const getAgentById = (req, res, next) => {
 export const createAgent = (req, res, next) => {
   try {
     console.log("Barbara created")
-    console.log(req.body); 
-    req.body.cargo = req.body.cargo.toLowerCase();
     console.log(req.body);
     const data = agentSchema.parse(req.body);
     const created = repository.create(data);
@@ -59,7 +57,6 @@ export const updateAgent = (req, res, next) => {
   try {
     const { id } = req.params;
     console.log("Barbara updated")
-    req.body.cargo = req.body.cargo.toLowerCase();
     console.log(req.body)
     const data = agentSchema.parse(req.body);
     const updated = repository.update(id, data);
@@ -77,7 +74,6 @@ export const patchAgent = (req, res, next) => {
   try {
     const { id } = req.params;
     console.log("Barbara pathed")
-    req.body.cargo = req.body.cargo.toLowerCase();
     console.log(req.body);
     const partial = agentPatchSchema.parse(req.body);
     const patched = repository.patch(id, partial);

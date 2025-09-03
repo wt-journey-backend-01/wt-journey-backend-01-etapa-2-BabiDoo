@@ -39,8 +39,11 @@ export const getAgentById = (req, res, next) => {
 };
 
 export const createAgent = (req, res, next) => {
-  try { 
+  try {
+    console.log("Barbara created")
+    console.log(req.body); 
     req.body.cargo = req.body.cargo.toLowerCase();
+    console.log(req.body);
     const data = agentSchema.parse(req.body);
     const created = repository.create(data);
     return res.status(201).json(created);
@@ -55,7 +58,9 @@ export const createAgent = (req, res, next) => {
 export const updateAgent = (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log("Barbara updated")
     req.body.cargo = req.body.cargo.toLowerCase();
+    console.log(req.body)
     const data = agentSchema.parse(req.body);
     const updated = repository.update(id, data);
     if (!updated) return next(new ApiError('Agente não encontrado.', 404));
@@ -71,7 +76,9 @@ export const updateAgent = (req, res, next) => {
 export const patchAgent = (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log("Barbara pathed")
     req.body.cargo = req.body.cargo.toLowerCase();
+    console.log(req.body);
     const partial = agentPatchSchema.parse(req.body);
     const patched = repository.patch(id, partial);
     if (!patched) return next(new ApiError('Agente não encontrado.', 404));

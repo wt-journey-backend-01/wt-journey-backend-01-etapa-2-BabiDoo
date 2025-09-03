@@ -76,7 +76,7 @@ export const patchAgent = (req, res, next) => {
     const updated = { ...current, ...data };
     console.log('patching agentes')
     // console.log(candidate);
-    repository.patch(id, data);
+    repository.patch(id, updated);
     console.log('patched: ', updated);
     return res.status(200).json(updated);
   } catch (err) {

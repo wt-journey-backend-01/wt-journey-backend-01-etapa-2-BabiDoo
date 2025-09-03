@@ -28,23 +28,23 @@ export const getAllAgents = (req, res, next) => {
 };
 
 export const getAgentById = (req, res, next) => {
-  console.log(req.params.id)
+  console.log('ID recebido:', req.params.id);
+
   let id;
   try {
     ({ id } = idSchema.parse(req.params));
-  } catch {
+  } catch (err) {
+    console.log('Erro ao validar ID:', err);
     return next(new ApiError("Agente não encontrado.", 404));
   }
+
   const agent = repository.findById(id);
-  if (!agent) return next(new ApiError('Agente não encontrado.', 404));
-  try {
-    return res.status(200).json(agent);
-  } catch {
-    return next(new ApiError('Erro ao buscar o agente.'));
+  if (!agent) {
+    console.log('Agente não encontrado com ID:', id);
+    return next(new ApiError('Agente não encontrado.', 404));
   }
 
-
-
+  return res.status(200).json(agent);
 };
 
 export const createAgent = (req, res, next) => {

@@ -69,11 +69,10 @@ export const updateAgent = (req, res, next) => {
   console.log(current);
   if (!current) return next(new ApiError("Agente não encontrado.", 404));
   try {
-    const candidate = { ...current, ...req.body };
+    // const candidate = { ...current, ...req.body };
     console.log('updating agentes')
-    console.log(candidate);
-    const data = agentPutValidation.parse(candidate);
-    // console.log(data);
+    // console.log(candidate);
+    const data = agentSchema.parse(req.body);
     const updated = repository.update(id, data);
     console.log('updated: ', updated);
     return res.status(200).json(updated);

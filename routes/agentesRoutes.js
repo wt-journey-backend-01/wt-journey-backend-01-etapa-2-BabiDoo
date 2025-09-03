@@ -92,8 +92,6 @@ const agentRouter = express.Router();
  *           application/json:
  *             schema: { $ref: '#/components/schemas/Error' }
  */
-agentRouter.get('/', controller.getAllAgents);
-agentRouter.post('/', controller.createAgent);
 
 /**
  * @openapi

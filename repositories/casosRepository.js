@@ -7,7 +7,7 @@ const findAll = () => cases;
 const findById = (id) => cases.find((c) => c.id === id);
 
 const create = (data) => {
-  const newCase = { id: uuidv4(), ...data }; //cria casos com uuidv4()
+  const newCase = { ...data, id: uuidv4() };; //cria casos com uuidv4()
   cases.push(newCase);
   return newCase;
 };
@@ -15,7 +15,7 @@ const create = (data) => {
 const update = (id, data) => {
   const index = cases.findIndex((c) => c.id === id);
   if (index === -1) return null;
-  cases[index] = { id, ...data };
+  cases[index] = { ...data, id };
   return cases[index];
 };
 

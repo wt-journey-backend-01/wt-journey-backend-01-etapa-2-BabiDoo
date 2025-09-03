@@ -60,6 +60,7 @@ export const createAgent = (req, res, next) => {
 
 export const updateAgent = (req, res, next) => {
   let id;
+  console.log('updating agentes: ', req.body)
   try {
     ({ id } = idSchema.parse(req.params));
   } catch {
@@ -86,21 +87,31 @@ export const updateAgent = (req, res, next) => {
   }
 };
 
-
 export const patchAgent = (req, res, next) => {
+  let id;
   try {
-    const { id } = req.params;
-    console.log("Barbara pathed")
-    console.log(req.body);
-    const partial = agentPatchSchema.parse(req.body);
-    const patched = repository.patch(id, partial);
-    if (!patched) return next(new ApiError('Agente não encontrado.', 404));
-    return res.status(200).json(patched);
+    ({ id } = idSchema.parse(req.params));
+  } catch {
+    return next(new ApiError("Agente não encontrado.", 404));
+  }
+  const current = repository.findById(id);
+  console.log(current);
+  if (!current) return next(new ApiError("Agente não encontrado.", 404));
+  try {
+    const candidate = { ...current, ...req.body };
+    console.log('patching agentes')
+    // console.log(candidate);
+    const data = agentPutValidation.parse(candidate);
+    const updated = repository.patch(id, data);
+    console.log('patched: ', updated);
+    return res.status(200).json(updated);
   } catch (err) {
     if (err instanceof ZodError) {
       console.log(err);
-      return next(new ApiError('Parâmetros inválidos.', 400))};
-    return next(new ApiError('Erro ao atualizar o agente.'));
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
+    console.log(err);
+    return next(new ApiError("Erro ao atualizar o agente."));
   }
 };
 

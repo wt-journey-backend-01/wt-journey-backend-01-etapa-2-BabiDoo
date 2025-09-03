@@ -62,6 +62,7 @@ export const createAgent = (req, res, next) => {
 
 
 export const patchAgent = (req, res, next) => {
+  console.log(req.body);
   let id;
   try {
     ({ id } = idSchema.parse(req.params));

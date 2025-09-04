@@ -59,11 +59,16 @@ export const createCase = (req, res, next) => {
 };
 
 export const updateCase = (req, res, next) => {
-  let id;
+  let id, agente_id;
   try {
     ({ id, agente_id } = idSchema.parse(req.params));
   } catch {
-    return next(new ApiError('Id precisa ser UUID.', 400));
+    return next(new ApiError('Ids precisam ser UUID.', 400));
+  }
+  try {
+    let agente_id = agentesRepo.findById(agente_id);
+  } catch {
+    return next(new ApiError('Agente nao existe.', 404));
   }
   try {
     const dados = caseSchema.parse(req.body);

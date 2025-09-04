@@ -7,7 +7,7 @@ export const agentSchema = z
   dataDeIncorporacao: z
     .string({ required_error: 'A data de incorporação é obrigatória.' })
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'A data deve estar no formato YYYY-MM-DD.'),
-  cargo: z.string({ required_error: 'Cargo é obrigatório.' })
+  cargo: z.string({ required_error: 'Cargo é obrigatório.' }).min(1)
 }).strict();
 
 

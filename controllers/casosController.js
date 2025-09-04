@@ -50,19 +50,23 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    return next(new ApiError("Erro ao criar o caso."));
+    if (err instanceof ZodError) {
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
+    return next(new ApiError("Erro ao atualizar o caso."), 500);
   }
 };
 
 export const updateCase = (req, res, next) => {
   let id;
-  try {
+  try { 
     ({ id } = idSchema.parse(req.params));
-  } catch {
-    return next(new ApiError('Ids precisam ser UUID.', 400));
+  } catch (err) {
+    console.log(err)
+    return next(new ApiError('Id precisa ser UUID.', 400));
   }
   try {
-    const dados = caseSchema.parse(req.body);
+    const dados = caseSchema.parse(req.params);
     const agente = agentesRepo.findById(dados.agente_id);
     if (!agente) {
       return next(new ApiError('Agente não existe.', 404));
@@ -84,7 +88,7 @@ export const patchCase = (req, res, next) => {
   let id;
   try {
     ({ id } = idSchema.parse(req.params));
-  } catch {
+  } catch (err){
     return next(new ApiError('Id precisa ser UUID.', 400));
   }
   try {

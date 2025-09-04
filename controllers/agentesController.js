@@ -94,7 +94,7 @@ export const updateAgent = (req, res, next) => {
   try {
     ({ id } = idSchema.parse(req.params));
   } catch {
-    return next(new ApiError("Agente não encontrado.", 404));
+    return next(new ApiError("Id precisa ser UUID.", 404));
   }
   const current = repository.findById(id);
   if (!current) return next(new ApiError("Agente não encontrado.", 404));

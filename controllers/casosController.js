@@ -50,32 +50,32 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    console.log(err)
-    if (err instanceof ZodError) {
-      return next(new ApiError('Parâmetros inválidos.', 400));
-    }
     return next(new ApiError('Erro ao criar o caso.', 404));
   }
 };
 
 export const updateCase = (req, res, next) => {
+  let id;
   try {
-    const { id } = req.params;
-    const data = caseSchema.parse(req.body);
-    if (!agentesRepo.findById(data.agente_id)) {
-      return next(new ApiError('Agente informado não existe.', 404));
-    }
-    const updated = repository.update(id, data);
-    if (!updated) return next(new ApiError('Caso não encontrado.', 404));
-    return res.status(200).json(updated);
-  } catch (err) {
-    if (err instanceof ZodError) {
-      console.log(err)
-      return next(new ApiError('Parâmetros inválidos.', 404));
-    }
-    return next(new ApiError('Erro ao atualizar o caso.', 500));
+    ({ id } = idSchema.parse(req.params));
+  } catch {
+    return next(new ApiError("Id precisa ser UUID.", 404));
   }
-};
+  const current = repository.findById(id);
+  if(!current) return next(new ApiError("Caso não encontrado.", 404));
+  try {
+    const dados = caseSchema.parse(req.body);
+    const casoAtualizado = repository.update(id, dados);
+    return res.status(200).json(casoAtualizado);
+  } catch (error) {
+    if (err instanceof ZodError) {
+          console.log(err);
+          return next(new ApiError("Parâmetros inválidos.", 400));
+        }
+        console.log(err);
+        return next(new ApiError("Erro ao atualizar o caso.", 500));
+      }
+  };
 
 export const patchCase = (req, res, next) => {
   let id;
@@ -97,7 +97,7 @@ export const patchCase = (req, res, next) => {
   } catch (err) {
     if (err instanceof ZodError) {
       console.log(err);
-      return next(new ApiError("Parâmetros inválidos.", 404));
+      return next(new ApiError("Parâmetros inválidos.", 400));
     }
     console.log(err);
     return next(new ApiError("Erro ao atualizar o caso."));

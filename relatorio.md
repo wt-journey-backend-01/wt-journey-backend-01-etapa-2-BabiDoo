@@ -2,18 +2,20 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - BabiDoo
 
-**Data:** 04/09/2025 15:14
+**Data:** 04/09/2025 19:18
 
-**Nota Final:** `86.36/100`
+**Nota Final:** `83.63/100`
 **Status:** ✅ Aprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `3` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
-  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 400 ao tentar criar caso com payload em formato incorreto`
-    - **Melhoria sugerida**: Seu endpoint de criação de casos (`POST /casos`) não está validando payloads incorretos. O teste enviou dados inválidos e esperava um status `400 Bad Request`, mas recebeu outro. Implemente uma validação robusta para os dados de entrada.
-  - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 400 ao tentar atualizar um caso por completo com método PUT com payload em formato incorreto`
-    - **Melhoria sugerida**: Sua rota de atualização completa de casos (`PUT /casos/:id`) não está retornando `400 Bad Request` para payloads inválidos. Garanta que a validação de dados ocorra antes da tentativa de atualização.
+- Foram encontrados `4` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+  - ⚠️ **Falhou no teste**: `UPDATE: Atualiza dados de um caso com por completo (com PUT) corretamente`
+    - **Melhoria sugerida**: A atualização completa de casos (`PUT /casos/:id`) não funcionou. O teste esperava um status `200 OK` e o caso com os dados atualizados. Verifique se sua rota está recebendo o payload completo e substituindo os dados existentes corretamente.
+  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 404 ao tentar criar caso com id de agente inválido/inexistente`
+    - **Melhoria sugerida**: Ao tentar criar um caso com um `agente_id` inexistente, o teste não recebeu `404 Not Found`. Sua API deve ser capaz de identificar que o agente referenciado não existe e retornar o status apropriado.
+  - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso inexistente`
+    - **Melhoria sugerida**: Ao tentar atualizar um caso inexistente com `PUT /casos/:id`, o teste não recebeu `404 Not Found`. A rota deve indicar que o recurso não foi encontrado.
   - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso inexistente`
     - **Melhoria sugerida**: Ao tentar atualizar um caso inexistente com `PATCH /casos/:id`, o teste não recebeu `404 Not Found`. Certifique-se de que sua rota verifica a existência do recurso antes de tentar a atualização.
 

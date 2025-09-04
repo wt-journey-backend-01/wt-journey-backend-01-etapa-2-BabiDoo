@@ -48,7 +48,7 @@ export const getAgentById = (req, res, next) => {
 
 export const createAgent = (req, res, next) => {
   try {
-    const data = agentSchema.parse(req.body);
+    const data = agentSchema.parse(req.body); 
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {

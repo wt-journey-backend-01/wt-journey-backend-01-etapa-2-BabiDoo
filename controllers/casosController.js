@@ -28,28 +28,33 @@ export const getCaseById = (req, res, next) => {
   let id;
   try {
     ({ id } = idSchema.parse(req.params));
-  } catch {
-    return next(new ApiError('Id precisa ser UUID.', 400));
+  } catch (err) {
+    console.log('Erro ao validar ID:', err);
+    return next(new ApiError("Id precisa ser UUID.", 404));
   }
+
   const caso = repository.findById(id);
-    if (!caso) {
-      return next(new ApiError('Caso nao encontrado.', 404));
-    }
-  
-    return res.status(200).json(caso);
+  if (!caso) {
+    console.log('Caso não encontrado com ID:', id);
+    return next(new ApiError('Agente não encontrado.', 404));
+  }
+
+  return res.status(200).json(caso);
 };
 
 export const createCase = (req, res, next) => {
   try {
     const data = caseSchema.parse(req.body);
-    if (!agentesRepo.findById(data.agente_id)) {
-      return next(new ApiError('Agente informado não existe.', 404));
-    }
+    const agent = agentesRepo.findById(data.agente_id);
+    if(!agent) return next(new ApiError('Agente não encontrado.', 404));
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
-    return next(new ApiError('Erro ao criar o caso.'));
+    console.log(err)
+    if (err instanceof ZodError) {
+      return next(new ApiError('Parâmetros inválidos.', 400));
+    }
+    return next(new ApiError('Erro ao criar o caso.', 404));
   }
 };
 

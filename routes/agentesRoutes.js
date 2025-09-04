@@ -1,6 +1,5 @@
 import express from 'express';
 import * as controller from '../controllers/agentesController.js';
-import { requireUuidParam } from '../utils/requireUuidParam.js';
 
 const agentRouter = express.Router();
 
@@ -150,8 +149,8 @@ const agentRouter = express.Router();
  *       '404': { description: Agente não encontrado, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
  */
 
-agentRouter.get('/', controller.getAllAgents); // sem requireUuidParam
-agentRouter.post('/', controller.createAgent); // sem requireUuidParam
+agentRouter.get('/', controller.getAllAgents); 
+agentRouter.post('/', controller.createAgent);
 agentRouter.get('/:id', controller.getAgentById);
 agentRouter.put('/:id', controller.updateAgent);
 agentRouter.patch('/:id',controller.patchAgent);

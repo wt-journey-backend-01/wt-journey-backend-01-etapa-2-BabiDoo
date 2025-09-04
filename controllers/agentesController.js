@@ -1,5 +1,5 @@
 import * as repository from '../repositories/agentesRepository.js';
-import { agentSchema, agentPatchValidation} from '../utils/agentValidation.js';
+import { agentSchema } from '../utils/agentValidation.js';
 import { agentPatchSchema } from '../utils/partialDataValidation.js';
 import { ZodError, z } from 'zod';
 
@@ -34,7 +34,7 @@ export const getAgentById = (req, res, next) => {
     ({ id } = idSchema.parse(req.params));
   } catch (err) {
     console.log('Erro ao validar ID:', err);
-    return next(new ApiError("Agente não encontrado.", 404));
+    return next(new ApiError("Id precisa ser UUID.", 404));
   }
 
   const agent = repository.findById(id);

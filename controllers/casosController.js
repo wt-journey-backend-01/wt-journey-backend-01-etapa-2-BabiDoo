@@ -2,7 +2,9 @@ import * as repository from '../repositories/casosRepository.js';
 import * as agentesRepo from '../repositories/agentesRepository.js';
 import { caseSchema } from '../utils/caseValidation.js';
 import { casePatchSchema } from '../utils/partialDataValidation.js';
-import { ZodError } from 'zod';
+import { ZodError, z } from 'zod';
+
+const idSchema = z.object({ id: z.uuid() });
 
 class ApiError extends Error {
   constructor(message, statusCode = 500) {
@@ -23,14 +25,18 @@ export const getAllCases = (req, res, next) => {
 };
 
 export const getCaseById = (req, res, next) => {
+  let id;
   try {
-    const { id } = req.params;
-    const found = repository.findById(id);
-    if (!found) return next(new ApiError('Caso não encontrado.', 404));
-    return res.status(200).json(found);
+    ({ id } = idSchema.parse(req.params));
   } catch {
-    return next(new ApiError('Erro ao buscar o caso.'));
+    return next(new ApiError('Id precisa ser UUID.', 400));
   }
+  const caso = repository.findById(id);
+    if (!caso) {
+      return next(new ApiError('Caso nao encontrado.', 404));
+    }
+  
+    return res.status(200).json(caso);
 };
 
 export const createCase = (req, res, next) => {
@@ -67,18 +73,29 @@ export const updateCase = (req, res, next) => {
 };
 
 export const patchCase = (req, res, next) => {
+  let id;
   try {
-    const { id } = req.params;
-    const partial = casePatchSchema.parse(req.body);
-    if (partial.agente_id && !agentesRepo.findById(partial.agente_id)) {
-      return next(new ApiError('Agente informado não existe.', 404));
-    }
-    const patched = repository.patch(id, partial);
-    if (!patched) return next(new ApiError('Caso não encontrado.', 404));
-    return res.status(200).json(patched);
+    ({ id } = idSchema.parse(req.params));
+  } catch {
+    return next(new ApiError('Id precisa ser UUID.', 400));
+  }
+  const current = repository.findById(id);
+  console.log(current);
+  if (!current) return next(new ApiError("Caso não encontrado.", 404));
+  try {
+    const data = casePatchSchema.parse(req.body);
+    const updated = { ...current, ...data };
+    console.log('patching case')
+    repository.patch(id, updated);
+    console.log('patched: ', updated);
+    return res.status(200).json(updated);
   } catch (err) {
-    if (err instanceof ZodError) return next(new ApiError('Parâmetros inválidos.', 400));
-    return next(new ApiError('Erro ao atualizar o caso.'));
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
+    console.log(err);
+    return next(new ApiError("Erro ao atualizar o caso."));
   }
 };
 

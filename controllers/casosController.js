@@ -50,28 +50,23 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    if (err instanceof ZodError) {
-      return next(new ApiError("Parâmetros inválidos.", 400));
-    }
-    console.log(err);
-    return next(new ApiError("Erro ao atualizar o caso."));
+    return next(new ApiError("Erro ao criar o caso."));
   }
 };
 
 export const updateCase = (req, res, next) => {
-  let id, agente_id;
+  let id;
   try {
-    ({ id, agente_id } = idSchema.parse(req.params));
+    ({ id } = idSchema.parse(req.params));
   } catch {
     return next(new ApiError('Ids precisam ser UUID.', 400));
   }
   try {
-    let agente_id = agentesRepo.findById(agente_id);
-  } catch {
-    return next(new ApiError('Agente nao existe.', 404));
-  }
-  try {
     const dados = caseSchema.parse(req.body);
+    const agente = agentesRepo.findById(dados.agente_id);
+    if (!agente) {
+      return next(new ApiError('Agente não existe.', 404));
+    }
     const current = repository.findById(id);
   if(!current) return next(new ApiError("Caso não encontrado.", 404));
     const casoAtualizado = repository.update(id, dados);

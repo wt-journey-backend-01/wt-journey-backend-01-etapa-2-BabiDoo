@@ -5,7 +5,6 @@ import { casePatchSchema } from '../utils/partialDataValidation.js';
 import { ZodError, z } from 'zod';
 
 const idSchema = z.object({ id: z.uuid() });
-const agentIdSchema = z.object({ agente_id: z.uuid() });
 
 class ApiError extends Error {
   constructor(message, statusCode = 500) {
@@ -45,11 +44,12 @@ export const getCaseById = (req, res, next) => {
 
 export const createCase = (req, res, next) => {
   try { 
-    const data = caseSchema.parse(req.body);
-    const agent = agentesRepo.findById(data.agente_id);
+    const { agente_id } = z.object({ agente_id: z.uuid() }).parse(req.body);
+    const agent = agentesRepo.findById(agente_id);
     if (!agent) {
       return  next(new ApiError("Agente nao encontrado"), 404);
     }
+    const data = caseSchema.parse(req.body);
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {

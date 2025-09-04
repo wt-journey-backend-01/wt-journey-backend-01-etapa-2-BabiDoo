@@ -69,7 +69,7 @@ export const updateCase = (req, res, next) => {
     return res.status(200).json(casoAtualizado);
   } catch (error) {
     if (err instanceof ZodError) {
-          console.log(err);
+          console.log(error);
           return next(new ApiError("Parâmetros inválidos.", 400));
         }
         console.log(err);

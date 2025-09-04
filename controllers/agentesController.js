@@ -42,32 +42,19 @@ export const getAgentById = (req, res, next) => {
   return res.status(200).json(agent);
 };
 
-import { z, ZodError } from "zod";
 
-const onlyAgentId = z.object({ agente_id: z.uuid() });
-const caseBodySchema = caseSchema.omit({ agente_id: true });
 
-export const createCase = (req, res, next) => {
+export const createAgent = (req, res, next) => {
   try {
-    const { agente_id } = onlyAgentId.parse(req.body);
-
-    const agent = agentesRepo.findById(agente_id);
-    if (!agent) return next(new ApiError("Agente não encontrado.", 404));
-
-    const data = caseBodySchema.parse(req.body);
-
-    const created = repository.create(data, agente_id);
+    const data = agentSchema.parse(req.body); 
+    const created = repository.create(data);
     return res.status(201).json(created);
-
   } catch (err) {
     if (err instanceof ZodError) {
-      return next(new ApiError("Parâmetros inválidos.", 400));
-    }
-    return next(new ApiError("Erro ao criar o caso.", 500));
+      return next(new ApiError('Parâmetros inválidos.', 400))};
+    return next(new ApiError('Erro ao criar o agente.'));
   }
 };
-
-
 
 
 export const patchAgent = (req, res, next) => {

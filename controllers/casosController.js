@@ -54,7 +54,7 @@ export const createCase = (req, res, next) => {
   try {
     const data = caseSchema.parse(req.body);
     const agent = agentesRepo.findById(data.agente_id);
-    if(!agent) return next(new ApiError('Agente não encontrado ou inválido.', 400));
+    if(!agent) return next(sendStatus(400));
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {

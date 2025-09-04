@@ -51,6 +51,7 @@ export const createCase = (req, res, next) => {
     return res.status(201).json(created);
   } catch (err) {
     if (err instanceof ZodError) {
+      console.log(err);
       return next(new ApiError("Parâmetros inválidos.", 400));
     }
     return next(new ApiError("Erro ao atualizar o caso."), 500);
@@ -66,7 +67,7 @@ export const updateCase = (req, res, next) => {
     return next(new ApiError('Id precisa ser UUID.', 400));
   }
   try {
-    const dados = caseSchema.parse(req.params);
+    const dados = caseSchema.parse(req.body);
     const agente = agentesRepo.findById(dados.agente_id);
     if (!agente) {
       return next(new ApiError('Agente não existe.', 404));
@@ -77,6 +78,7 @@ export const updateCase = (req, res, next) => {
     return res.status(200).json(casoAtualizado);
   } catch (err) {
     if (err instanceof ZodError) {
+      console.log(err);
       return next(new ApiError("Parâmetros inválidos.", 400));
     }
     console.log(err);

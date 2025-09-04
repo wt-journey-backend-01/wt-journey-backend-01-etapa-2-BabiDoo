@@ -53,10 +53,6 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    if (err instanceof ZodError) {
-      console.log(err);
-      return next(new ApiError("Parâmetros inválidos.", 400));
-    }
     return next(new ApiError("Erro ao criar o caso."), 500);
   }
 };

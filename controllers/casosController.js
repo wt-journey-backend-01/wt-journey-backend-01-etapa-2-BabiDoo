@@ -71,9 +71,9 @@ export const updateCase = (req, res, next) => {
   } catch (err) {
     if (err instanceof ZodError) {
       console.log(err)
-      return next(new ApiError('Parâmetros inválidos.', 400));
+      return next(new ApiError('Parâmetros inválidos.', 404));
     }
-    return next(new ApiError('Erro ao atualizar o caso.'));
+    return next(new ApiError('Erro ao atualizar o caso.', 500));
   }
 };
 
@@ -97,7 +97,7 @@ export const patchCase = (req, res, next) => {
   } catch (err) {
     if (err instanceof ZodError) {
       console.log(err);
-      return next(new ApiError("Parâmetros inválidos.", 400));
+      return next(new ApiError("Parâmetros inválidos.", 404));
     }
     console.log(err);
     return next(new ApiError("Erro ao atualizar o caso."));

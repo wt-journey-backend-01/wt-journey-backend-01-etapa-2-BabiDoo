@@ -2,14 +2,16 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - BabiDoo
 
-**Data:** 04/09/2025 21:54
+**Data:** 04/09/2025 22:00
 
-**Nota Final:** `86.36/100`
+**Nota Final:** `80.36/100`
 **Status:** ✅ Aprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `3` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+- Foram encontrados `4` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 400 ao tentar criar caso com payload em formato incorreto`
+    - **Melhoria sugerida**: Seu endpoint de criação de casos (`POST /casos`) não está validando payloads incorretos. O teste enviou dados inválidos e esperava um status `400 Bad Request`, mas recebeu outro. Implemente uma validação robusta para os dados de entrada.
   - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 404 ao tentar criar caso com id de agente inválido/inexistente`
     - **Melhoria sugerida**: Ao tentar criar um caso com um `agente_id` inexistente, o teste não recebeu `404 Not Found`. Sua API deve ser capaz de identificar que o agente referenciado não existe e retornar o status apropriado.
   - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso inexistente`

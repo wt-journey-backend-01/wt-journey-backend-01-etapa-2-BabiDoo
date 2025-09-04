@@ -1,6 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 
-const agents = [];
+const agents = [
+  {
+    "nome": "Bruno",
+    "dataDeIncorporacao": "2023-05-10",
+    "cargo": "delegado",
+    "id": "76c38917-db8e-479b-a771-a24b7c96748b"
+}
+];
 
 const findAll = () => agents;
 

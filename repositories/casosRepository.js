@@ -1,6 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
-const cases = [];
+const cases = [{
+    "titulo": "Roubo",
+    "descricao": "Itens levados",
+    "status": "aberto",
+    "agente_id": "76c38917-db8e-479b-a771-a24b7c96748b",
+    "id": "27de17e2-0786-43f9-8ba8-a52fbd695ba2"
+}];
 
 const findAll = () => cases;
 

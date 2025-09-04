@@ -50,21 +50,34 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
-    return next(new ApiError('Erro ao criar o caso.', 404));
+    if (err instanceof ZodError) {
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
+    console.log(err);
+    return next(new ApiError("Erro ao atualizar o caso."));
   }
 };
 
 export const updateCase = (req, res, next) => {
-  let { id } = (req.params);
-  const current = repository.findById(id);
-  if(!current) return next(new ApiError("Caso não encontrado.", 404));
+  let id;
   try {
-    const dados = casePatchSchema.parse(req.body);
+    ({ id, agente_id } = idSchema.parse(req.params));
+  } catch {
+    return next(new ApiError('Id precisa ser UUID.', 400));
+  }
+  try {
+    const dados = caseSchema.parse(req.body);
+    const current = repository.findById(id);
+  if(!current) return next(new ApiError("Caso não encontrado.", 404));
     const casoAtualizado = repository.update(id, dados);
     return res.status(200).json(casoAtualizado);
   } catch (err) {
-          return next(new ApiError("Parâmetros inválidos.", 404));
-        }
+    if (err instanceof ZodError) {
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
+    console.log(err);
+    return next(new ApiError("Erro ao atualizar o caso."));
+  }
   };
 
 export const patchCase = (req, res, next) => {
@@ -74,11 +87,10 @@ export const patchCase = (req, res, next) => {
   } catch {
     return next(new ApiError('Id precisa ser UUID.', 400));
   }
-  const current = repository.findById(id);
-  console.log(current);
-  if (!current) return next(new ApiError("Caso não encontrado.", 404));
   try {
     const data = casePatchSchema.parse(req.body);
+    const current = repository.findById(id);
+    if (!current) return next(new ApiError("Caso não encontrado.", 404));
     const updated = { ...current, ...data };
     console.log('patching case')
     repository.patch(id, updated);

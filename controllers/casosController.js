@@ -29,13 +29,11 @@ export const getCaseById = (req, res, next) => {
   try {
     ({ id } = idSchema.parse(req.params));
   } catch (err) {
-    console.log('Erro ao validar ID:', err);
     return next(new ApiError("Id precisa ser UUID.", 404));
   }
 
   const caso = repository.findById(id);
   if (!caso) {
-    console.log('Caso não encontrado com ID:', id);
     return next(new ApiError('Agente não encontrado.', 404));
   }
 
@@ -45,7 +43,7 @@ export const getCaseById = (req, res, next) => {
 
 export const createCase = (req, res, next) => {
   console.log("Tenta criar: ", req.body);
-  console.log("Params de: ", req.params);
+  console.log("Params de: ", req.params.id);
   try {
     const { agente_id } = z.object({ agente_id: z.uuid() }).parse(req.body);
     const agent = agentesRepo.findById(agente_id);
@@ -56,9 +54,12 @@ export const createCase = (req, res, next) => {
     return res.status(201).json(created);
 
   } catch (err) {
+    console.log(err)
     if (err instanceof ZodError) {
       return next(new ApiError("Parâmetros inválidos.", 400));
+
     }
+    console.log(err)
     return next(new ApiError("Erro ao criar o caso.", 500));
   }
 };
@@ -69,7 +70,6 @@ export const updateCase = (req, res, next) => {
   try { 
     ({ id } = idSchema.parse(req.params));
   } catch (err) {
-    console.log(err)
     return next(new ApiError('Id precisa ser UUID.', 400));
   }
   try {

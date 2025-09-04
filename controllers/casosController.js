@@ -44,17 +44,12 @@ export const getCaseById = (req, res, next) => {
 };
 
 export const createCase = (req, res, next) => {
-  let agente_id;
   try { 
-    ({ agente_id } = agentIdSchema.parse(req.body));
-  } catch (err) {
-    console.log(err)
-    return next(new ApiError('Id precisa ser UUID.', 400));
-  }
-  try {
     const data = caseSchema.parse(req.body);
     const agent = agentesRepo.findById(data.agente_id);
-    if(!agent) return next(sendStatus(400));
+    if (!agent) {
+      return res.status(404).json({ error: "Agente não encontrado." });
+    }
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
@@ -62,7 +57,7 @@ export const createCase = (req, res, next) => {
       console.log(err);
       return next(new ApiError("Parâmetros inválidos.", 400));
     }
-    return next(new ApiError("Erro ao atualizar o caso."), 500);
+    return next(new ApiError("Erro ao criar o caso."), 500);
   }
 };
 

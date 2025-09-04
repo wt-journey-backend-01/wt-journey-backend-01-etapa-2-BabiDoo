@@ -5,6 +5,7 @@ import { casePatchSchema } from '../utils/partialDataValidation.js';
 import { ZodError, z } from 'zod';
 
 const idSchema = z.object({ id: z.uuid() });
+const agentIdSchema = z.object({ agente_id: z.uuid() });
 
 class ApiError extends Error {
   constructor(message, statusCode = 500) {
@@ -43,6 +44,13 @@ export const getCaseById = (req, res, next) => {
 };
 
 export const createCase = (req, res, next) => {
+  let agente_id;
+  try { 
+    ({ agente_id } = agentIdSchema.parse(req.body));
+  } catch (err) {
+    console.log(err)
+    return next(new ApiError('Id precisa ser UUID.', 400));
+  }
   try {
     const data = caseSchema.parse(req.body);
     const agent = agentesRepo.findById(data.agente_id);
@@ -50,6 +58,10 @@ export const createCase = (req, res, next) => {
     const created = repository.create(data);
     return res.status(201).json(created);
   } catch (err) {
+    if (err instanceof ZodError) {
+      console.log(err);
+      return next(new ApiError("Parâmetros inválidos.", 400));
+    }
     return next(new ApiError("Erro ao atualizar o caso."), 500);
   }
 };

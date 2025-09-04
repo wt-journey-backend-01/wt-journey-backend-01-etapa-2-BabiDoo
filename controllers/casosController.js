@@ -44,6 +44,8 @@ export const getCaseById = (req, res, next) => {
 
 
 export const createCase = (req, res, next) => {
+  console.log("Tenta criar: ", req.body);
+  console.log("Params de: ", req.params);
   try {
     const { agente_id } = z.object({ agente_id: z.uuid() }).parse(req.body);
     const agent = agentesRepo.findById(agente_id);
